@@ -1,0 +1,17 @@
+{
+    "name": "aroldm/myhelpdesk",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Arold Mauger"
+        }
+    ],
+    "require": {
+        "altorouter/altorouter": "^2.0",
+        "twig/twig": "^3.16"
+    }
+}
