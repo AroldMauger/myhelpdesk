@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/css/style.css">
+    <title>MyHelpdesk</title>
+<style>
+    .display-message {
+        display: flex;
+        align-content: center;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9em;
+        color:white;
+        width: 50%;
+        height: 2rem;
+        text-align: center;
+    }
+    .alert-danger {
+        background: red;
+    }
+    .alert-success {
+        background: green;
+    }
+    .connection-link {
+        text-decoration: none;
+        color:white;
+    }
+    .connection-link:hover {
+        cursor: pointer;
+        color:rgba(250, 190, 0);
+    }
+</style>
+</head>
+<body class="login-body">
+<div class="logo-wrapper">
+    <img src="/images/mary.svg" class="logo-mary">
+
+    <!-- Affichage des messages de succès ou d'erreur -->
+    {% if success_message %}
+        <div class="display-message alert alert-success" role="alert">
+            <span>{{ success_message | raw }}</span>
+        </div>
+    {% endif %}
+    {% if error_message %}
+        <div class="display-message alert alert-danger" role="alert">
+           <span> {{ error_message }}</span>
+        </div>
+    {% endif %}
+
+    <form class="wrapper-login-form" action="/signup" method="POST">
+        <h3>Formulaire de création d'un compte</h3>
+        <div class="group-form-input">
+            <label for="email">Email utilisateur</label>
+            <input type="text" id="email" name="email" required>
+        </div>
+        <div class="group-form-input">
+            <label for="password">Mot de passe</label>
+            <input type="password" id="password" name="password" required pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$%^&+=!])(?!.*\s).{8,}$"  title="Min. 8 caractères dont minuscule, majuscule, chiffre et caractère spécial.">
+        </div>
+        <span id="password-error" class="error-message"></span>
+
+        <div class="wrapper-signup-link">
+            <a href="login">Déjà un compte? Connectez-vous.</a>
+        </div>
+        <div class="group-form-input">
+            <button type="submit" id="signup-btn" class="login-btn">Créer</button>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>
+

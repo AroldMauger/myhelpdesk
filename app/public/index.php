@@ -5,7 +5,11 @@ require_once "../vendor/autoload.php";
 
 $router = new AltoRouter();
 
-$router->map( 'GET', '/', \App\Controller\HomeController::class . "#test", 'home' );
+$router->map( 'GET', '/', \App\Controller\HomeController::class . "#home", 'home' );
+
+$router->map( 'GET', '/login', \App\Controller\LoginController::class . "#displayLogin", 'login-form' );
+$router->map( 'GET', '/signup', \App\Controller\LoginController::class . "#displaySignup", 'signup-form' );
+$router->map( 'POST', '/signup', \App\Controller\LoginController::class . "#signup", 'signup' );
 
 
 $match = $router->match();
