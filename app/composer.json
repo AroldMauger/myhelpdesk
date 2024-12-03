@@ -12,6 +12,8 @@
     ],
     "require": {
         "altorouter/altorouter": "^2.0",
-        "twig/twig": "^3.16"
+        "twig/twig": "^3.16",
+        "ext-json" : "*",
+        "ext-pdo": "*"
     }
 }
