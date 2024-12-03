@@ -68,6 +68,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: myhelpdesk
+      MYSQL_HOST: database
       MYSQL_USER: user
       MYSQL_PASSWORD: password
     ports:
