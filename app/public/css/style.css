@@ -79,6 +79,7 @@
 aside {
     display: flex;
     flex-direction: column;
+    gap:3rem;
     background: rgb(247, 250, 252);
     padding: 20px;
     border-radius: 10px;
@@ -175,4 +176,97 @@ aside {
     margin-top: 10px;
     font-size: 16px;
     font-weight: bold;
+}
+
+/* Section pour afficher les messages */
+.conversation-details {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.messages-list {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+}
+
+.message {
+    background-color: #f1f1f1;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+}
+
+.message-time {
+    font-size: 0.85rem;
+    color: #888;
+    margin-top: 5px;
+}
+
+/* Formulaire pour ajouter un message */
+.message-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.message-form textarea {
+    height: 100px;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    resize: none;
+}
+
+.message-form .btn-submit {
+    align-self: flex-start;
+    background-color: rgb(27 74 147);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.message-form .btn-submit:hover {
+    background-color: #45a049;
+}
+
+/* Section pour la notation */
+.rating-stars {
+    margin-bottom: 20px;
+}
+
+.rating-stars button {
+    background-color: transparent;
+    border: none;
+    color: rgba(250, 190, 0);
+    font-size: 2rem;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.rating-stars button:hover {
+    color: #e65100;
+}
+
+.btn-end-conversation {
+    background-color: #f44336;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.btn-end-conversation:hover {
+    background-color: #e53935;
+}
+
+.error-message {
+    color: red;
+    margin-top: 10px;
 }

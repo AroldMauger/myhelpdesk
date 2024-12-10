@@ -20,4 +20,27 @@ class HomeController extends AbstractController
         ]);
     }
 
+
+    public function previousConversations() {
+
+                if (isset($_SESSION['user_id'])) {
+                    $username = $_SESSION['username'];
+                    $userId = $_SESSION['user_id'];
+
+                    $stmt = $this->pdo->prepare('SELECT * FROM conversations WHERE user_id = ? ORDER BY created_at DESC');
+                    $stmt->execute([$userId]);
+                    $conversations = $stmt->fetchAll();
+
+                } else {
+                    header('Location: /login');
+                    exit;
+                }
+
+                // Passer les données dans la vue
+                echo $this->render('previous.html.twig', [
+                    'username' => $username,
+                    'conversations' => $conversations,
+                ]);
+            }
+
 }

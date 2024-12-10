@@ -1,3 +1,4 @@
 mysqldata/*
 app/vendor/*
 .idea
+.env

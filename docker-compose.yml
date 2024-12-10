@@ -1,6 +1,7 @@
 version: "3.8"
 volumes:
   mysqldata:
+  ollama_data: # Volume pour Ollama
 
 networks:
   default:
@@ -16,6 +17,7 @@ services:
       DATABASE_DSN: mysql:dbname=myhelpdesk;host=mysql
       DATABASE_USER: user
       DATABASE_PASSWORD: password
+      MISTRAL_API_KEY: ${MISTRAL_API_KEY:-}
     cap_add:
       - SYS_PTRACE
     volumes:
@@ -27,6 +29,8 @@ services:
         target: "/workspace"
     networks:
       - default
+    depends_on:
+      - ollama
 
   nginx:
     build:
@@ -87,3 +91,16 @@ services:
       PMA_HOST: database
       PMA_USER: 'root'
       PMA_PASSWORD: 'password'
+    networks:
+      - default
+
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    ports:
+      - "11434:11434" # Port pour accéder à l'API Ollama
+    volumes:
+      - ollama_data:/root/.ollama # Volume pour les modèles et données persistantes
+    networks:
+      - default
+    command: ""
