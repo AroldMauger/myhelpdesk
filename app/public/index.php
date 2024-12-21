@@ -19,6 +19,7 @@ $router->map('POST', '/add-message', \App\Controller\ConversationController::cla
 $router->map('POST', '/end-conversation', \App\Controller\ConversationController::class . '#endConversation', 'end_conversation');
 $router->map('GET', '/conversation', \App\Controller\ConversationController::class . "#viewConversation", 'view_conversation');
 $router->map('GET', '/previous', \App\Controller\HomeController::class . "#previousConversations", 'previous_conversations');
+$router->map('POST', '/upload-file', \App\Controller\ConversationController::class . "#uploadFile", 'upload_file');
 
 
 $match = $router->match();

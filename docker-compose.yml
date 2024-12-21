@@ -2,6 +2,7 @@ version: "3.8"
 volumes:
   mysqldata:
   ollama_data: # Volume pour Ollama
+  openwebui_data: # Volume pour Open WebUI
 
 networks:
   default:
@@ -29,8 +30,8 @@ services:
         target: "/workspace"
     networks:
       - default
-    depends_on:
-      - ollama
+#    depends_on:
+#      - ollama
 
   nginx:
     build:
@@ -94,6 +95,27 @@ services:
     networks:
       - default
 
+##OPTION 2 : openwebui +ollama dans la même image. Toujours lent
+#  openwebui:
+#    image: ghcr.io/open-webui/open-webui:ollama
+#    container_name: openwebui
+#    ports:
+#      - "3000:8080"  # Port pour accéder à Open WebUI
+#    environment:
+#      WEBUI_AUTH: False
+#    volumes:
+#      - openwebui_data:/app/backend/data  # Volume pour persister les données Open WebUI
+#    networks:
+#      - default
+#    restart: always
+#    deploy:
+#      resources:
+#        limits:
+#          memory: 8G  #
+
+
+#OPTION 1 : openwebui et ollama dans deux images séparés. Fonctionnel, mais beaucoup trop lent
+
   ollama:
     image: ollama/ollama
     container_name: ollama
@@ -104,3 +126,34 @@ services:
     networks:
       - default
     command: ""
+
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: openwebui
+    ports:
+      - "3000:8080" # Port pour accéder à Open WebUI
+    environment:
+      WEBUI_AUTH: False
+      OLLAMA_BASE_URL: http://ollama:11434 # Indique à Open WebUI l'URL de l'API Ollama
+    volumes:
+      - openwebui_data:/app/backend/data # Volume pour persister les données Open WebUI
+    networks:
+      - default
+    depends_on:
+      - ollama
+
+
+##OPTION 3 : utiliser OPENAI, mais c'est payant
+#  openwebui:
+#    image: ghcr.io/open-webui/open-webui:main  # Image compatible avec OpenAI
+#    container_name: openwebui
+#    ports:
+#      - "3000:8080"  # Port pour accéder à Open WebUI
+#    environment:
+#      OPENAI_API_KEY: OPENAI_API_KEY
+#      WEBUI_AUTH: False  # Désactive l'authentification
+#    volumes:
+#      - openwebui_data:/app/backend/data  # Volume pour persister les données Open WebUI
+#    networks:
+#      - default
+#    restart: always

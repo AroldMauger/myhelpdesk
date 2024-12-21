@@ -111,36 +111,106 @@ class ConversationController extends AbstractController
 
     public function askChatbot(string $userMessage): ChatBotMessageDTO
     {
-        $apiUrl = 'http://192.168.32.1:11434/api/generate';
-        $model = 'mistral';
+        $apiUrl = 'http://192.168.32.1:3000/api/chat/completions';
+        $model = 'mistral:latest'; // Modèle que vous utilisez
+        $accessToken = getenv('MISTRAL_API_KEY'); // Récupère la variable d'environnement pour le token
 
+        // Structure de la requête pour l'API OpenWebUI
         $data = [
             'model' => $model,
-            'prompt' => "[INST] $userMessage [/INST]",
-            'raw' => true,
-            'stream' => false,
+            'messages' => [
+                [
+                    'role' => 'user',
+                    'content' => $userMessage, // Le message de l'utilisateur
+                ]
+            ]
         ];
 
+        // Initialisation de la requête cURL
         $ch = curl_init($apiUrl);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json',
+            'Authorization: Bearer ' . $accessToken, // Ajoute le token Bearer pour l'authentification
         ]);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 
+        // Exécution de la requête
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
+        // Vérification du code de statut HTTP
         if ($httpCode !== 200 || $response === false) {
-            return new ChatBotMessageDTO('Désolé, une erreur est survenue.', false);
+            return new ChatBotMessageDTO('Désolé, une erreur est survenue.', false); // Si la requête échoue
         }
 
+        // Traitement de la réponse de l'API
         $responseData = json_decode($response, true);
-        $content = $responseData['response'] ?? 'Réponse non valide';
+        $content = $responseData['choices'][0]['message']['content'] ?? 'Réponse non valide'; // Extraire la réponse de l'API
 
+        // Retourner la réponse sous forme d'un DTO
         return new ChatBotMessageDTO($content, true);
+    }
+
+    public function uploadFile()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
+            $apiUrl = 'http://localhost:3000/api/v1/files/'; // Endpoint d'upload du fichier
+            $filePath = $_FILES['file']['tmp_name'];
+            $fileName = $_FILES['file']['name'];
+
+            // Envoi du fichier à l'API
+            $ch = curl_init($apiUrl);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Authorization: Bearer ' . getenv('MISTRAL_API_KEY'), // Utilisation de la clé API
+                'Accept: application/json',
+            ]);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, [
+                'file' => new \CURLFile($filePath, mime_content_type($filePath), $fileName),
+            ]);
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            if ($httpCode !== 200 || $response === false) {
+                $_SESSION['error_message'] = 'Erreur lors de l’upload du fichier.';
+                header('Location: /conversation?id=' . ($_GET['id'] ?? ''));
+                exit;
+            }
+
+            // Traitement de la réponse pour récupérer l'ID du fichier
+            $responseData = json_decode($response, true);
+            $fileId = $responseData['id']; // ID du fichier téléchargé
+
+            $_SESSION['success_message'] = 'Fichier ajouté avec succès. ID : ' . $fileId;
+
+            // Vous pouvez maintenant utiliser cet ID de fichier dans une autre fonction pour poser des questions
+            $_SESSION['file_id'] = $fileId;
+
+            header('Location: /conversation?id=' . ($_GET['id'] ?? ''));
+            exit;
+        }
+    }
+
+
+    private function extractTextFromPdf($filePath)
+    {
+        // Si vous utilisez une bibliothèque PHP pour extraire le texte d'un PDF
+        // Par exemple, vous pouvez utiliser une bibliothèque comme `setasign/fpdi`
+        // Voici un exemple simplifié (vous devrez l'adapter pour votre propre bibliothèque)
+
+        // Assurez-vous d'avoir installé une bibliothèque pour lire des PDF (ex : pdftotext)
+        // Le code ici est juste un exemple
+        $content = '';
+        if (file_exists($filePath)) {
+            $content = shell_exec("pdftotext " . escapeshellarg($filePath) . " -");
+        }
+        return $content;
     }
 
 }

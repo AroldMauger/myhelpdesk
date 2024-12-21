@@ -15,6 +15,7 @@
         "twig/twig": "^3.16",
         "ext-json" : "*",
         "ext-pdo": "*",
-        "ext-curl": "*"
+        "ext-curl": "*",
+        "ext-fileinfo": "*"
     }
 }

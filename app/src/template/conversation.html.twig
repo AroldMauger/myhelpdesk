@@ -118,6 +118,16 @@
         <a href="/logout">Déconnexion</a>
     </div>
 
+
+    <section class="upload-section">
+        <h3>Ajouter un fichier pour enrichir la conversation</h3>
+        <form action="/upload-file" method="POST" enctype="multipart/form-data">
+            <input type="file" name="file" required>
+            <button type="submit">Envoyer</button>
+        </form>
+    </section>
+
+
     <section class="conversation-details">
         <h3>Messages</h3>
         <div class="messages-list">
