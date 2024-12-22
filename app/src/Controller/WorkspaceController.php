@@ -77,13 +77,17 @@ class WorkspaceController extends AbstractController
                 $successMessage = 'Espace de travail créé avec succès !';
             }
         }
-        $workspaces = $this->getWorkspaces();
+        if ($response === false ) {
+            $errorMessage = 'Une erreur est survenue lors de la création du workspace.';
+            $_SESSION['error_message'] = $errorMessage;
+            return $this->displayWorkspaces();
+        } else {
+            $successMessage = 'Espace de travail créé avec succès !';
+            $_SESSION['success_message'] = $successMessage;
+            return $this->displayWorkspaces();
 
-        echo $this->render('workspaces/workspaces.html.twig', [
-            'success_message' => $successMessage,
-            'error_message' => $errorMessage,
-            'workspaces' => $workspaces['workspaces'] ?? [],
-        ]);
+        }
+
     }
 
     public function getWorkspaces() {
@@ -184,6 +188,44 @@ class WorkspaceController extends AbstractController
 
         }
     }
+
+    public function deleteDocument($params) {
+        $docpath = urldecode($params['docpath']); // Décoder le chemin du document
+        $apiUrl = 'http://172.27.144.1:3001/api/v1/system/remove-documents';
+        $accessToken = getenv('JWT_SECRET');
+
+        // Préparer les données pour la requête
+        $deletePayload = json_encode([
+            'names' => [$docpath]
+        ]);
+
+        // Effectuer la requête DELETE
+        $ch = curl_init($apiUrl);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $deletePayload);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Accept: application/json',
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $accessToken,
+        ]);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        // Vérification de la réponse
+        if ($httpCode === 200) {
+            $_SESSION['success_message'] = "Document supprimé avec succès.";
+        } else {
+            $_SESSION['error_message'] = "Erreur lors de la suppression du document.";
+        }
+
+        // Redirection après suppression
+        return $this->displayWorkspaces();
+
+    }
+
 
     public function upload($workspaceSlug)
     {

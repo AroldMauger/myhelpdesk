@@ -81,7 +81,10 @@
                             <li class="document-item">
                                 <div class="document-header">
                                     <span class="document-title">{{ document.metadata.title ?? 'Titre inconnu' }}</span>
-                                    <button class="delete-btn" data-doc-id="{{ document.id }}">X</button>
+                                    <form action="/delete-document/{{ document.docpath | url_encode }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce document ?');">
+                                        <input type="hidden" name="_method" value="DELETE">
+                                        <button class="delete-btn">X</button>
+                                    </form>
                                 </div>
                                 <div class="document-info">
                                     <span class="document-date">Créé le : {{ document.createdAt|date('d/m/Y H:i:s') }}</span>

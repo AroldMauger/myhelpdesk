@@ -299,6 +299,7 @@ aside {
 
 .delete-btn:hover {
     background-color: #e60000;
+    cursor: pointer;
 }
 
 .document-info {
