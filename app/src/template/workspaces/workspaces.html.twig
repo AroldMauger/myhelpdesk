@@ -63,32 +63,46 @@
             <button type="submit" class="chatbot-submit">Créer</button>
         </form>
     </section>
+    {% if workspaces is empty %}
+        <p>Aucun espace de travail trouvé.</p>
+    {% else %}
+        {% for workspace in workspaces %}
+            <div class="workspace-card">
+                <form class="form-delete" action="/delete/{{ workspace.slug }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet espace de travail ?');">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <button type="submit" class="delete-btn">X</button>
+                </form>
+                <h2>{{ workspace.name }}</h2>
 
-        {% if workspaces %}
-            <section class="workspaces-section">
-                <h3>Tous les espaces de travail</h3>
-                <div class="cards-wrapper">
-                {% for workspace in workspaces %}
-                        <div class="workspace-card">
-                            <form class="form-delete" action="/delete/{{ workspace.slug }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet espace de travail ?');">
-                                <input type="hidden" name="_method" value="DELETE">
-                                <button type="submit" class="delete-btn">X</button>
-                            </form>
-                            <p>{{ workspace.name }}</p>
-                            <!-- Formulaire d'upload pour chaque espace de travail -->
-                            <form action="/upload-document/{{ workspace.slug }}" method="POST" enctype="multipart/form-data" class="upload-file-form">
-                                <label for="document">Ajouter document</label>
-                                <input type="file" name="document" id="document" required>
-                                <button type="submit" class="upload-submit">Télécharger</button>
-                            </form>
-                        </div>
+                {% if workspace.documents is defined and workspace.documents is not empty %}
+                    <h3>Documents :</h3>
+                    <ul class="document-list">
+                        {% for document in workspace.documents %}
+                            <li class="document-item">
+                                <div class="document-header">
+                                    <span class="document-title">{{ document.metadata.title ?? 'Titre inconnu' }}</span>
+                                    <button class="delete-btn" data-doc-id="{{ document.id }}">X</button>
+                                </div>
+                                <div class="document-info">
+                                    <span class="document-date">Créé le : {{ document.createdAt|date('d/m/Y H:i:s') }}</span>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>Aucun document disponible pour cet espace de travail.</p>
+                {% endif %}
 
-                    {% endfor %}
-                </div>
-            </section>
-        {% else %}
-            <p>Aucun espace de travail trouvé.</p>
-        {% endif %}
+                <!-- Formulaire d'upload pour chaque espace de travail -->
+                <form action="/upload-document/{{ workspace.slug }}" method="POST" enctype="multipart/form-data" class="upload-file-form">
+                    <label for="document">Ajouter document</label>
+                    <input type="file" name="document" id="document" required>
+                    <button type="submit" class="upload-submit">Télécharger</button>
+                </form>
+            </div>
+        {% endfor %}
+    {% endif %}
+
 
     {#    <section class="chatbot-section">#}
     {#        <h3>Ajouter un fichier pour enrichir le chatbot</h3>#}

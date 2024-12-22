@@ -5,7 +5,6 @@ namespace App\Controller;
 class WorkspaceController extends AbstractController
 {
     public function displayWorkspaces() {
-
         $success_message = isset($_SESSION['success_message']) ? $_SESSION['success_message'] : null;
         $error_message = isset($_SESSION['error_message']) ? $_SESSION['error_message'] : null;
 
@@ -14,12 +13,25 @@ class WorkspaceController extends AbstractController
 
         $workspaces = $this->getWorkspaces();
 
+        // Décoder les métadonnées JSON pour chaque document
+        foreach ($workspaces as &$workspace) {
+            if (isset($workspace['documents']) && is_array($workspace['documents'])) {
+                foreach ($workspace['documents'] as &$document) {
+                    if (isset($document['metadata'])) {
+                        $document['metadata'] = json_decode($document['metadata'], true);
+                    }
+                }
+            }
+        }
+
         echo $this->render('workspaces/workspaces.html.twig', [
-            'workspaces' => $workspaces['workspaces'] ?? [],
+            'workspaces' => $workspaces,
             'success_message' => $success_message,
             'error_message' => $error_message,
         ]);
     }
+
+
 
 
     public function createWorkspace($workspaceTitle) {
@@ -89,13 +101,49 @@ class WorkspaceController extends AbstractController
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
+
         if ($httpCode === 200 && $response !== false) {
-            $workspaces = json_decode($response, true);
+            $workspacesData = json_decode($response, true);
+            $workspaces = $workspacesData['workspaces'] ?? [];
+
+            // Récupérer les documents pour chaque workspace
+            foreach ($workspaces as &$workspace) {
+                $workspace['documents'] = $this->getWorkspaceDocuments($workspace['slug']);
+            }
+
             return $workspaces;
         }
-
-        return null;
+        return [];
     }
+
+
+    private function getWorkspaceDocuments($slug) {
+        $apiUrl = "http://172.27.144.1:3001/api/v1/workspace/{$slug}";
+        $accessToken = getenv('JWT_SECRET');
+
+        $ch = curl_init($apiUrl);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Accept: application/json',
+            'Authorization: Bearer ' . $accessToken,
+        ]);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($httpCode === 200 && $response !== false) {
+            $workspaceData = json_decode($response, true);
+            if (isset($workspaceData['workspace'][0]['documents'])) {
+                return $workspaceData['workspace'][0]['documents'];
+            }
+        }
+
+        return [];
+    }
+
+
+
     public function delete($workspaceSlug)
     {
         //  $workspaceSlug est un tableau
@@ -222,4 +270,6 @@ class WorkspaceController extends AbstractController
 
         return $updateHttpCode === 200 && isset($updateData['success']) && $updateData['success'];
     }
+
+
 }
