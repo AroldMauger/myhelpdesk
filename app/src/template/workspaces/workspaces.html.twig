@@ -77,8 +77,8 @@
                             <p>{{ workspace.name }}</p>
                             <!-- Formulaire d'upload pour chaque espace de travail -->
                             <form action="/upload-document/{{ workspace.slug }}" method="POST" enctype="multipart/form-data" class="upload-file-form">
-                                <label for="document_{{ workspace.id }}">Ajouter document</label>
-                                <input type="file" name="document" id="document_{{ workspace.id }}" required>
+                                <label for="document">Ajouter document</label>
+                                <input type="file" name="document" id="document" required>
                                 <button type="submit" class="upload-submit">Télécharger</button>
                             </form>
                         </div>

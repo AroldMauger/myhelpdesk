@@ -22,7 +22,9 @@ $router->map( 'POST', '/create-workspace', \App\Controller\WorkspaceController::
 
 //Route workspaces
 $router->map( 'GET', '/workspaces', \App\Controller\WorkspaceController::class . "#displayWorkspaces", 'workspaces' );
-$router->map( 'DELETE', '/delete/[:slug]', \App\Controller\WorkspaceController::class . "#delete", 'delete_workspace' );
+$router->map( 'DELETE', '/delete/[:slug]', \App\Controller\WorkspaceController::class . "#delete", 'delete' );
+$router->map( 'POST', '/upload-document/[:slug]', \App\Controller\WorkspaceController::class . "#upload", 'upload' );
+
 
 //Routes authentication
 $router->map( 'GET', '/login', \App\Controller\LoginController::class . "#displayLogin", 'login-form' );

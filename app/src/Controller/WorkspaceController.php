@@ -102,10 +102,9 @@ class WorkspaceController extends AbstractController
         if (is_array($workspaceSlug) && isset($workspaceSlug['slug'])) {
             $workspaceSlug = $workspaceSlug['slug'];
         } else {
-            return $this->render('workspaces/confirmation.html.twig', [
-                'error_message' => 'Slug non valide ou absent.',
-                'workspaces' => $this->getWorkspaces(),
-            ]);
+            $error_message = "Slug non valide ou absent.";
+            $_SESSION['error_message'] = $error_message;
+            return $this->displayWorkspaces();
         }
 
         $apiUrl = 'http://172.27.144.1:3001/api/v1/workspace/' . $workspaceSlug;
@@ -136,5 +135,91 @@ class WorkspaceController extends AbstractController
             return $this->displayWorkspaces();
 
         }
+    }
+
+    public function upload($workspaceSlug)
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document']) && $_FILES['document']['error'] === UPLOAD_ERR_OK) {
+
+            $file = $_FILES['document'];
+            $apiUrl = 'http://172.27.144.1:3001/api/v1/document/upload';
+            $accessToken = getenv('JWT_SECRET');
+
+            $ch = curl_init($apiUrl);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Authorization: Bearer ' . $accessToken,
+                'Accept: application/json',
+            ]);
+
+
+            $postFields = [
+                'file' => new \CURLFile($file['tmp_name'], $file['type'], $file['name'])
+            ];
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
+
+            $response = curl_exec($ch);
+
+            // Vérifier si la requête a échoué
+            if (curl_errno($ch)) {
+                $error_message = 'Erreur cURL: ' . curl_error($ch);
+                curl_close($ch);
+                return $this->render('workspaces/workspaces.html.twig', [
+                    'error_message' => $error_message,
+                ]);
+            }
+            curl_close($ch);
+            $data = json_decode($response, true);
+
+            if ($response === false || empty($response)) {
+                $error_message = "Erreur lors du téléchargement du fichier.";
+                $_SESSION['error_message'] = $error_message;
+                return $this->displayWorkspaces();
+            } else {
+                $documentLocation = $data['documents'][0]['location'];
+                $this->updateWorkspace($workspaceSlug, $documentLocation);
+                $success_message = "Fichier téléchargé avec succès.";
+                $_SESSION['success_message'] = $success_message;
+                return $this->displayWorkspaces();
+            }
+        }
+    }
+
+    public function updateWorkspace($workspaceSlug, $documentLocation)
+    {
+        if (is_array($workspaceSlug) && isset($workspaceSlug['slug'])) {
+            $workspaceSlug = $workspaceSlug['slug'];
+        } else {
+            $error_message = "Slug non valide ou absent.";
+            $_SESSION['error_message'] = $error_message;
+            return $this->displayWorkspaces();
+        }
+        $updateApiUrl = "http://172.27.144.1:3001/api/v1/workspace/$workspaceSlug/update-embeddings";
+        $accessToken = getenv('JWT_SECRET');
+
+        $updatePostData = json_encode([
+            'adds' => [
+                $documentLocation,
+            ]
+        ]);
+
+        $updateCh = curl_init($updateApiUrl);
+        curl_setopt($updateCh, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($updateCh, CURLOPT_POST, true);
+        curl_setopt($updateCh, CURLOPT_HTTPHEADER, [
+            'Authorization: Bearer ' . $accessToken,
+            'Content-Type: application/json',
+            'Accept: application/json',
+        ]);
+        curl_setopt($updateCh, CURLOPT_POSTFIELDS, $updatePostData);
+
+        $updateResponse = curl_exec($updateCh);
+        $updateHttpCode = curl_getinfo($updateCh, CURLINFO_HTTP_CODE);
+        curl_close($updateCh);
+
+        $updateData = json_decode($updateResponse, true);
+
+        return $updateHttpCode === 200 && isset($updateData['success']) && $updateData['success'];
     }
 }
