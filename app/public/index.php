@@ -5,15 +5,20 @@ require_once "../vendor/autoload.php";
 
 $router = new AltoRouter();
 
+//Route dashboard for users
 $router->map( 'GET', '/home', \App\Controller\HomeController::class . "#home", 'home' );
 
+//Route dashboard for admin
+$router->map( 'GET', '/admin', \App\Controller\AdminController::class . "#home", 'admin' );
+
+//Routes authentication
 $router->map( 'GET', '/login', \App\Controller\LoginController::class . "#displayLogin", 'login-form' );
 $router->map( 'GET', '/signup', \App\Controller\LoginController::class . "#displaySignup", 'signup-form' );
 $router->map( 'POST', '/signup', \App\Controller\LoginController::class . "#signup", 'signup' );
 $router->map( 'POST', '/login', \App\Controller\LoginController::class . "#login", 'login' );
 $router->map( 'GET', '/logout', \App\Service\SessionService::class . "#logout", 'logout' );
 
-
+//Routes chatbot
 $router->map('POST', '/start-conversation', \App\Controller\ConversationController::class . '#startConversation', 'start_conversation');
 $router->map('POST', '/add-message', \App\Controller\ConversationController::class . '#addMessage', 'add_message');
 $router->map('POST', '/end-conversation', \App\Controller\ConversationController::class . '#endConversation', 'end_conversation');

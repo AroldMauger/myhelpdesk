@@ -69,12 +69,19 @@ class LoginController extends AbstractController
             $stmt->execute([$email]);
             $user = $stmt->fetch();
             if ($user && password_verify($password, $user['password_hash'])) {
-                // Connexion réussie, créez une session
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['username'] = $user['username'];
+                if($user['role'] === 'utilisateur') {
+                    // Connexion réussie, créez une session
+                    $_SESSION['user_id'] = $user['id'];
+                    $_SESSION['username'] = $user['username'];
 
-                header('Location: /home');
-                exit;
+                    header('Location: /home');
+                    exit;
+                } elseif ($user['role'] === 'administrateur') {
+                    $_SESSION['user_id'] = $user['id'];
+                    $_SESSION['username'] = $user['username'];
+                    header('Location: /admin');
+                    exit;
+                }
             } else {
                 $this->sessionService->setMessage('error_message', 'Email utilisateur ou mot de passe incorrect.');
                 header('Location: /login');
