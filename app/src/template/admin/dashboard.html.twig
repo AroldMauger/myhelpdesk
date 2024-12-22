@@ -35,6 +35,9 @@
     <a href="/workspaces">
         <button>Espaces de travail</button>
     </a>
+    <a href="/previous">
+        <button>Conversations</button>
+    </a>
 </aside>
 
 <main class="main-dashboard">
@@ -46,10 +49,24 @@
     <section class="chatbot-section">
         <h3>Initier une conversation avec le Chatbot</h3>
         <form action="/start-conversation" method="POST">
+            <label for="workspace">Sélectionnez un espace de travail :</label>
+            <select name="workspace_slug" id="workspace" required>
+                {% for workspace in workspaces %}
+                    <option value="{{ workspace.slug }}">{{ workspace.name }}</option>
+                {% endfor %}
+            </select>
             <input type="text" name="message" id="chatbot-query" class="chatbot-searchbar" placeholder="Posez votre question..." required>
             <button type="submit" class="chatbot-submit">Envoyer</button>
         </form>
     </section>
+
+{#    <section class="chatbot-section">#}
+{#        <h3>Initier une conversation avec le Chatbot</h3>#}
+{#        <form action="/start-conversation" method="POST">#}
+{#            <input type="text" name="message" id="chatbot-query" class="chatbot-searchbar" placeholder="Posez votre question..." required>#}
+{#            <button type="submit" class="chatbot-submit">Envoyer</button>#}
+{#        </form>#}
+{#    </section>#}
 
 </main>
 </body>

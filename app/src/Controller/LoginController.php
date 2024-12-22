@@ -73,12 +73,15 @@ class LoginController extends AbstractController
                     // Connexion réussie, créez une session
                     $_SESSION['user_id'] = $user['id'];
                     $_SESSION['username'] = $user['username'];
+                    $_SESSION['role'] = $user['role'];
 
                     header('Location: /home');
                     exit;
                 } elseif ($user['role'] === 'administrateur') {
                     $_SESSION['user_id'] = $user['id'];
                     $_SESSION['username'] = $user['username'];
+                    $_SESSION['role'] = $user['role'];
+
                     header('Location: /admin');
                     exit;
                 }

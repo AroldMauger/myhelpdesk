@@ -10,9 +10,24 @@
 <body class="dashboard-wrapper">
 <aside>
     <img src="/images/mary.svg" class="logo-dashboard">
-    <a href="/home">
-        <button>Accueil</button>
-    </a>
+    {% if role == 'utilisateur' %}
+        <a href="/home">
+            <button>Accueil</button>
+        </a>
+        <a href="/previous">
+            <button>Conversations</button>
+        </a>
+    {% elseif role == 'administrateur' %}
+        <a href="/admin">
+            <button>Accueil</button>
+        </a>
+        <a href="/workspaces">
+            <button>Espaces de travail</button>
+        </a>
+        <a href="/previous">
+            <button>Conversations</button>
+        </a>
+    {% endif %}
 </aside>
 
 <main class="main-dashboard">

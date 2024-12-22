@@ -15,17 +15,20 @@ class ConversationController extends AbstractController
             $sessionService->startSession();
 
             $userId = $_SESSION['user_id'];
-            $subject = $_POST['message'];
+            $workspaceSlug = $_POST['workspace_slug'];
+            $userMessage = $_POST['message'];
 
-            $chatbotResponse = $this->askChatbot($subject);
+            // Stocker le workspaceSlug dans la session
+            $_SESSION['workspace_slug'] = $workspaceSlug;
 
+            $chatbotResponse = $this->askChatbot($userMessage, $workspaceSlug);
             $stmt = $this->pdo->prepare('INSERT INTO conversations (user_id, subject) VALUES (?, ?)');
-            $stmt->execute([$userId, $subject]);
+            $stmt->execute([$userId, $userMessage]);
 
             $conversationId = $this->pdo->lastInsertId();
 
             $stmt = $this->pdo->prepare('INSERT INTO messages (conversation_id, user_id, message) VALUES (?, ?, ?)');
-            $stmt->execute([$conversationId, ChatBotConstants::CHAT_BOT_ID, $chatbotResponse->content]);  // 0 pour l'ID du chatbot
+            $stmt->execute([$conversationId, ChatBotConstants::CHAT_BOT_ID, $chatbotResponse->textResponse]);  // 0 pour l'ID du chatbot
 
             header('Location: /conversation?id=' . $conversationId);
             exit;
@@ -41,14 +44,14 @@ class ConversationController extends AbstractController
             $conversationId = $_POST['conversation_id'];
             $userId = $_SESSION['user_id'];
             $message = $_POST['message'];
+            $workspaceSlug = $_SESSION['workspace_slug'];
 
             $stmt = $this->pdo->prepare('INSERT INTO messages (conversation_id, user_id, message) VALUES (?, ?, ?)');
             $stmt->execute([$conversationId, $userId, $message]);
 
-            $chatbotResponse = $this->askChatbot($message);
-
+            $chatbotResponse = $this->askChatbot($message, $workspaceSlug);
             $stmt = $this->pdo->prepare('INSERT INTO messages (conversation_id, user_id, message) VALUES (?, ?, ?)');
-            $stmt->execute([$conversationId, ChatBotConstants::CHAT_BOT_ID, $chatbotResponse->content]);
+            $stmt->execute([$conversationId, ChatBotConstants::CHAT_BOT_ID, $chatbotResponse->textResponse]);
 
             header('Location: /conversation?id=' . $conversationId);
             exit;
@@ -81,6 +84,7 @@ class ConversationController extends AbstractController
     public function viewConversation()
     {
         $conversationId = $_GET['id'] ?? null;
+        $role = $_SESSION['role'] ?? null;
 
         if (!$conversationId) {
             header('Location: /home');
@@ -104,97 +108,42 @@ class ConversationController extends AbstractController
         echo $this->render('conversations/conversation.html.twig', [
             'conversation' => $conversation,
             'messages' => $messages,
-            'chatBotId' => ChatBotConstants::CHAT_BOT_ID
+            'chatBotId' => ChatBotConstants::CHAT_BOT_ID,
+            'role' => $role,
+
         ]);
     }
 
 
-    public function askChatbot(string $userMessage): ChatBotMessageDTO
+    public function askChatbot($userMessage, $workspaceSlug)
     {
-        $apiUrl = 'http://192.168.32.1:3000/api/chat/completions';
-        $model = 'mistral:latest'; // Modèle que vous utilisez
-        $accessToken = getenv('MISTRAL_API_KEY'); // Récupère la variable d'environnement pour le token
+        $apiUrl = "http://172.27.144.1:3001/api/v1/workspace/{$workspaceSlug}/chat";
+        $accessToken = getenv('JWT_SECRET');
 
-        // Structure de la requête pour l'API OpenWebUI
-        $data = [
-            'model' => $model,
-            'messages' => [
-                [
-                    'role' => 'user',
-                    'content' => $userMessage, // Le message de l'utilisateur
-                ]
-            ]
-        ];
+        $postData = json_encode([
+            'message' => $userMessage,
+            'mode' => 'chat'
+        ]);
 
-        // Initialisation de la requête cURL
         $ch = curl_init($apiUrl);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json',
-            'Authorization: Bearer ' . $accessToken, // Ajoute le token Bearer pour l'authentification
+            'Accept: application/json',
+            'Authorization: Bearer ' . $accessToken,
         ]);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 
-        // Exécution de la requête
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
-        // Vérification du code de statut HTTP
-        if ($httpCode !== 200 || $response === false) {
-            return new ChatBotMessageDTO('Désolé, une erreur est survenue.', false); // Si la requête échoue
+        if ($response !== false) {
+            return json_decode($response);
         }
 
-        // Traitement de la réponse de l'API
-        $responseData = json_decode($response, true);
-        $content = $responseData['choices'][0]['message']['content'] ?? 'Réponse non valide'; // Extraire la réponse de l'API
-
-        // Retourner la réponse sous forme d'un DTO
-        return new ChatBotMessageDTO($content, true);
-    }
-
-    public function uploadFile()
-    {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
-            $apiUrl = 'http://localhost:3000/api/v1/files/'; // Endpoint d'upload du fichier
-            $filePath = $_FILES['file']['tmp_name'];
-            $fileName = $_FILES['file']['name'];
-
-            // Envoi du fichier à l'API
-            $ch = curl_init($apiUrl);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                'Authorization: Bearer ' . getenv('MISTRAL_API_KEY'), // Utilisation de la clé API
-                'Accept: application/json',
-            ]);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, [
-                'file' => new \CURLFile($filePath, mime_content_type($filePath), $fileName),
-            ]);
-
-            $response = curl_exec($ch);
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            curl_close($ch);
-
-            if ($httpCode !== 200 || $response === false) {
-                $_SESSION['error_message'] = 'Erreur lors de l’upload du fichier.';
-                header('Location: /conversation?id=' . ($_GET['id'] ?? ''));
-                exit;
-            }
-
-            // Traitement de la réponse pour récupérer l'ID du fichier
-            $responseData = json_decode($response, true);
-            $fileId = $responseData['id']; // ID du fichier téléchargé
-
-            $_SESSION['success_message'] = 'Fichier ajouté avec succès. ID : ' . $fileId;
-
-            // Vous pouvez maintenant utiliser cet ID de fichier dans une autre fonction pour poser des questions
-            $_SESSION['file_id'] = $fileId;
-
-            header('Location: /conversation?id=' . ($_GET['id'] ?? ''));
-            exit;
-        }
+        return null; // En cas d'erreur
     }
 
 
