@@ -34,43 +34,6 @@
         </form>
     </section>
 
-    {% if conversation_id %}
-        <section class="conversation-details">
-            <h3>Messages de la conversation</h3>
-            <div class="messages-list">
-                {% for message in messages %}
-                    <div class="message">
-                        <p><strong>{{ message.user.username }} :</strong> {{ message.message }}</p>
-                        <span class="message-time">{{ message.created_at | date('d/m/Y H:i') }}</span>
-                    </div>
-                {% endfor %}
-            </div>
-
-            <form action="/add-message" method="POST">
-                <input type="hidden" name="conversation_id" value="{{ conversation_id }}">
-                <textarea name="message" placeholder="Écrivez votre message..." required></textarea>
-                <button type="submit">Envoyer</button>
-            </form>
-
-            {% if conversation_rating is not null %}
-                <form action="/end-conversation" method="POST">
-                    <input type="hidden" name="conversation_id" value="{{ conversation_id }}">
-                    <div class="rating-stars">
-                        <button type="submit" name="rating" value="1">&#9733;</button>
-                        <button type="submit" name="rating" value="2">&#9733;</button>
-                        <button type="submit" name="rating" value="3">&#9733;</button>
-                        <button type="submit" name="rating" value="4">&#9733;</button>
-                        <button type="submit" name="rating" value="5">&#9733;</button>
-                    </div>
-                </form>
-            {% else %}
-                <form action="/end-conversation" method="POST">
-                    <input type="hidden" name="conversation_id" value="{{ conversation_id }}">
-                    <button type="submit">Fin de la conversation</button>
-                </form>
-            {% endif %}
-        </section>
-    {% endif %}
 </main>
 </body>
 </html>

@@ -1,1 +1,76 @@
-Je suis admin!
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/css/style.css">
+    <title>MyHelpdesk</title>
+</head>
+<body class="dashboard-wrapper">
+<aside>
+    <img src="/images/mary.svg" class="logo-dashboard">
+    <a href="/home">
+        <button>Accueil</button>
+    </a>
+    <a href="/previous">
+        <button>Conversations</button>
+    </a>
+
+</aside>
+
+
+<main class="main-dashboard">
+    <div class="header-dashboard">
+        <h2>Bienvenue {{ username }} !</h2>
+        <a href="/logout">Déconnexion</a>
+    </div>
+
+    <section class="chatbot-section">
+        <h3>Initier une conversation avec le Chatbot</h3>
+        <form action="/start-conversation" method="POST">
+            <input type="text" name="message" id="chatbot-query" class="chatbot-searchbar" placeholder="Posez votre question..." required>
+            <button type="submit" class="chatbot-submit">Envoyer</button>
+        </form>
+    </section>
+
+    {% if conversation_id %}
+        <section class="conversation-details">
+            <h3>Messages de la conversation</h3>
+            <div class="messages-list">
+                {% for message in messages %}
+                    <div class="message">
+                        <p><strong>{{ message.user.username }} :</strong> {{ message.message }}</p>
+                        <span class="message-time">{{ message.created_at | date('d/m/Y H:i') }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <form action="/add-message" method="POST">
+                <input type="hidden" name="conversation_id" value="{{ conversation_id }}">
+                <textarea name="message" placeholder="Écrivez votre message..." required></textarea>
+                <button type="submit">Envoyer</button>
+            </form>
+
+            {% if conversation_rating is not null %}
+                <form action="/end-conversation" method="POST">
+                    <input type="hidden" name="conversation_id" value="{{ conversation_id }}">
+                    <div class="rating-stars">
+                        <button type="submit" name="rating" value="1">&#9733;</button>
+                        <button type="submit" name="rating" value="2">&#9733;</button>
+                        <button type="submit" name="rating" value="3">&#9733;</button>
+                        <button type="submit" name="rating" value="4">&#9733;</button>
+                        <button type="submit" name="rating" value="5">&#9733;</button>
+                    </div>
+                </form>
+            {% else %}
+                <form action="/end-conversation" method="POST">
+                    <input type="hidden" name="conversation_id" value="{{ conversation_id }}">
+                    <button type="submit">Fin de la conversation</button>
+                </form>
+            {% endif %}
+        </section>
+    {% endif %}
+</main>
+</body>
+</html>

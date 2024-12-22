@@ -8,7 +8,7 @@ class LoginController extends AbstractController
 {
     public function displayLogin(): void
     {
-        echo $this->render('login.html.twig', [
+        echo $this->render('authentication/login.html.twig', [
             'success_message' => $this->getSuccessMessage(),
             'error_message' => $this->getErrorMessage(),
         ]);
@@ -18,7 +18,7 @@ class LoginController extends AbstractController
 
     public function displaySignup(): void
     {
-        echo $this->render('signup.html.twig', [
+        echo $this->render('authentication/signup.html.twig', [
             'success_message' => $this->getSuccessMessage(),
             'error_message' => $this->getErrorMessage(),
         ]);

@@ -101,7 +101,7 @@ class ConversationController extends AbstractController
         $stmt->execute([$conversationId]);
         $messages = $stmt->fetchAll();
 
-        echo $this->render('conversation.html.twig', [
+        echo $this->render('conversations/conversation.html.twig', [
             'conversation' => $conversation,
             'messages' => $messages,
             'chatBotId' => ChatBotConstants::CHAT_BOT_ID
@@ -197,20 +197,5 @@ class ConversationController extends AbstractController
         }
     }
 
-
-    private function extractTextFromPdf($filePath)
-    {
-        // Si vous utilisez une bibliothèque PHP pour extraire le texte d'un PDF
-        // Par exemple, vous pouvez utiliser une bibliothèque comme `setasign/fpdi`
-        // Voici un exemple simplifié (vous devrez l'adapter pour votre propre bibliothèque)
-
-        // Assurez-vous d'avoir installé une bibliothèque pour lire des PDF (ex : pdftotext)
-        // Le code ici est juste un exemple
-        $content = '';
-        if (file_exists($filePath)) {
-            $content = shell_exec("pdftotext " . escapeshellarg($filePath) . " -");
-        }
-        return $content;
-    }
 
 }

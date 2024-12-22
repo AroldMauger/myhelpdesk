@@ -37,7 +37,7 @@ class HomeController extends AbstractController
                 }
 
                 // Passer les données dans la vue
-                echo $this->render('previous.html.twig', [
+                echo $this->render('conversations/previous.html.twig', [
                     'username' => $username,
                     'conversations' => $conversations,
                 ]);
