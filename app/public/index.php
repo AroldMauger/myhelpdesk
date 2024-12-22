@@ -5,11 +5,24 @@ require_once "../vendor/autoload.php";
 
 $router = new AltoRouter();
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['_method'])) {
+    $method = strtoupper($_POST['_method']);
+    if ($method === 'DELETE') {
+        $_SERVER['REQUEST_METHOD'] = 'DELETE';
+    }
+}
+
+
 //Route dashboard for users
 $router->map( 'GET', '/home', \App\Controller\HomeController::class . "#home", 'home' );
 
 //Route dashboard for admin
 $router->map( 'GET', '/admin', \App\Controller\AdminController::class . "#home", 'admin' );
+$router->map( 'POST', '/create-workspace', \App\Controller\WorkspaceController::class . "#createWorkspace", 'create_workspace' );
+
+//Route workspaces
+$router->map( 'GET', '/workspaces', \App\Controller\WorkspaceController::class . "#displayWorkspaces", 'workspaces' );
+$router->map( 'DELETE', '/delete/[:slug]', \App\Controller\WorkspaceController::class . "#delete", 'delete_workspace' );
 
 //Routes authentication
 $router->map( 'GET', '/login', \App\Controller\LoginController::class . "#displayLogin", 'login-form' );
@@ -25,6 +38,7 @@ $router->map('POST', '/end-conversation', \App\Controller\ConversationController
 $router->map('GET', '/conversation', \App\Controller\ConversationController::class . "#viewConversation", 'view_conversation');
 $router->map('GET', '/previous', \App\Controller\HomeController::class . "#previousConversations", 'previous_conversations');
 $router->map('POST', '/upload-file', \App\Controller\ConversationController::class . "#uploadFile", 'upload_file');
+
 
 
 $match = $router->match();

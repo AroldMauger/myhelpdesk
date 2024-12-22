@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+
 class AdminController extends AbstractController
 {
     public function home() {
@@ -14,7 +15,8 @@ class AdminController extends AbstractController
         }
 
         echo $this->render('admin/dashboard.html.twig', [
-            'username' => $username,
+            'username' => $username
         ]);
     }
+
 }

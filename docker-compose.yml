@@ -19,6 +19,7 @@ services:
       DATABASE_USER: user
       DATABASE_PASSWORD: password
       MISTRAL_API_KEY: ${MISTRAL_API_KEY:-}
+      JWT_SECRET: ${JWT_SECRET:-}
     cap_add:
       - SYS_PTRACE
     volumes:
