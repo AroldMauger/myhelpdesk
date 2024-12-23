@@ -12,6 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['_method'])) {
     }
 }
 
+$router->map( 'GET', '/', \App\Controller\HomeController::class . "#landingPage", 'landing_page' );
 
 //Route dashboard for users
 $router->map( 'GET', '/home', \App\Controller\HomeController::class . "#home", 'home' );

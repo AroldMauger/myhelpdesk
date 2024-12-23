@@ -7,6 +7,10 @@ use App\Service\SessionService;
 
 class HomeController extends AbstractController
 {
+
+    public function landingPage() {
+        echo $this->render('landing-page.html.twig');
+    }
     public function home() {
 
         if (isset($_SESSION['user_id'])) {

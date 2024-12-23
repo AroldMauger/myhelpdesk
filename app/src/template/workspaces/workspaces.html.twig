@@ -14,7 +14,7 @@
             justify-content: center;
             font-size: 0.9em;
             color:white;
-            width: 50%;
+            width: 100%;
             height: 2rem;
             text-align: center;
         }
@@ -29,14 +29,17 @@
 <body class="dashboard-wrapper">
 <aside>
     <img src="/images/mary.svg" class="logo-dashboard">
-    <a href="/admin">
+    <a href="/admin" class="link-nav-bar">
         <button>Accueil</button>
     </a>
-    <a href="/workspaces">
+    <a href="/workspaces" class="link-nav-bar">
         <button>Espaces de travail</button>
     </a>
-    <a href="/previous">
-        <button>Conversations</button>
+    <a href="/previous" class="link-nav-bar">
+        <button>Conversations administrateur</button>
+    </a>
+    <a href="/all-conversations" class="link-nav-bar">
+        <button>Conversations des utilisateurs</button>
     </a>
 </aside>
 
@@ -69,6 +72,8 @@
     {% if workspaces is empty %}
         <p>Aucun espace de travail trouvé.</p>
     {% else %}
+        <section class="workspace-card-container">
+
         {% for workspace in workspaces %}
             <div class="workspace-card">
                 <form class="form-delete" action="/delete/{{ workspace.slug }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet espace de travail ?');">
@@ -108,6 +113,7 @@
             </div>
         {% endfor %}
     {% endif %}
+        </section>
 
 
     {#    <section class="chatbot-section">#}

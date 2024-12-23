@@ -1,0 +1,65 @@
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+}
+
+header {
+    margin-bottom: 40px;
+}
+
+.logo-dashboard {
+    max-width: 200px;
+    margin-bottom: 20px;
+}
+
+h1 {
+    color: #1b4a93;
+}
+
+.description {
+    font-size: 1.2em;
+    margin-bottom: 30px;
+}
+
+.video-container {
+    max-width: 80%;
+    margin: 0 auto;
+    margin-bottom: 20px;
+}
+
+video {
+    width: 100%;
+    height: auto;
+}
+
+.cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.btn-primary, .btn-secondary {
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    color: white;
+}
+
+.btn-primary {
+    background-color: #1b4a93;
+}
+
+.btn-secondary {
+    background-color: #fcbc05;
+}
+
+.btn-primary:hover,
+.btn-secondary:hover {
+    opacity: 0.9;
+}
