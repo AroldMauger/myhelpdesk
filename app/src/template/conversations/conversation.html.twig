@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin.css">
+
     <title>Conversation</title>
     <style>
         .rating-stars {
@@ -108,21 +109,24 @@
 <aside>
     <img src="/images/mary.svg" class="logo-dashboard">
     {% if role == 'utilisateur' %}
-        <a href="/home">
+        <a href="/home" class="link-nav-bar">
             <button>Accueil</button>
         </a>
-        <a href="/previous">
+        <a href="/previous" class="link-nav-bar">
             <button>Conversations</button>
         </a>
     {% elseif role == 'administrateur' %}
-        <a href="/admin">
+        <a href="/admin" class="link-nav-bar">
             <button>Accueil</button>
         </a>
-        <a href="/workspaces">
+        <a href="/workspaces" class="link-nav-bar">
             <button>Espaces de travail</button>
         </a>
-        <a href="/previous">
-            <button>Conversations</button>
+        <a href="/previous" class="link-nav-bar">
+            <button>Conversations administrateur</button>
+        </a>
+        <a href="/all-conversations" class="link-nav-bar">
+            <button>Conversations des utilisateurs</button>
         </a>
     {% endif %}
 
@@ -137,7 +141,7 @@
 
     <section class="conversation-details">
         <h3>Messages</h3>
-        <div class="messages-list">
+        <div id="messages-container" class="messages-list">
             {% for message in messages %}
                 <div class="message {% if message.user_id == 0 %}message-chatbot{% else %}message-user{% endif %}">
                     <p class="message-content">{{ message.message }}</p>
@@ -150,6 +154,7 @@
 
 
         </div>
+        {% if role == 'utilisateur' or (role == 'administrateur' and user_id == conversation.user_id) %}
 
         <form action="/add-message" method="POST" class="message-form">
             <input type="hidden" name="conversation_id" value="{{ conversation.id }}">
@@ -172,29 +177,56 @@
             </form>
         {% else %}
             <p>La conversation a été notée : {{ conversation.rating }} étoiles.</p>
+            <p>Si les informations fournies ne sont pas suffisantes, ouvrez un ticket GLPI au service support informatique Mary.</p>
+        {% endif %}
         {% endif %}
 
     </section>
 </main>
 
 <script>
-    const stars = document.querySelectorAll('.star');
-    const ratingInput = document.getElementById('rating');
 
-    stars.forEach(star => {
-        star.addEventListener('click', () => {
-            const ratingValue = star.getAttribute('data-value');
-            ratingInput.value = ratingValue;
+    document.addEventListener('DOMContentLoaded', function() {
+        var messagesContainer = document.getElementById('messages-container');
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-            stars.forEach(star => {
-                if (star.getAttribute('data-value') <= ratingValue) {
-                    star.classList.add('active');
-                } else {
-                    star.classList.remove('active');
-                }
+        const messageForm = document.querySelector('.message-form');
+        const messageTextarea = messageForm.querySelector('textarea');
+
+        messageTextarea.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                messageForm.submit();
+            }
+        });
+
+        const stars = document.querySelectorAll('.star');
+        const ratingInput = document.getElementById('rating');
+        const ratingForm = document.querySelector('.rating-form');
+
+        stars.forEach(star => {
+            star.addEventListener('click', () => {
+                const ratingValue = star.getAttribute('data-value');
+                ratingInput.value = ratingValue;
+
+                stars.forEach(star => {
+                    if (star.getAttribute('data-value') <= ratingValue) {
+                        star.classList.add('active');
+                    } else {
+                        star.classList.remove('active');
+                    }
+                });
             });
         });
+
+        ratingForm.addEventListener('submit', function(event) {
+            if (!ratingInput.value) {
+                event.preventDefault();
+                alert("Veuillez sélectionner une note avant de terminer la conversation.");
+            }
+        });
     });
+
 </script>
 
 </body>

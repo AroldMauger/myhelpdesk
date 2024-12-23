@@ -22,8 +22,8 @@ class ConversationController extends AbstractController
             $_SESSION['workspace_slug'] = $workspaceSlug;
 
             $chatbotResponse = $this->askChatbot($userMessage, $workspaceSlug);
-            $stmt = $this->pdo->prepare('INSERT INTO conversations (user_id, subject) VALUES (?, ?)');
-            $stmt->execute([$userId, $userMessage]);
+            $stmt = $this->pdo->prepare('INSERT INTO conversations (user_id, subject, category) VALUES (?, ?, ?)');
+            $stmt->execute([$userId, $userMessage, $workspaceSlug]);
 
             $conversationId = $this->pdo->lastInsertId();
 
@@ -41,15 +41,35 @@ class ConversationController extends AbstractController
             $sessionService = new SessionService();
             $sessionService->startSession();
 
-            $conversationId = $_POST['conversation_id'];
+            $conversationId = $_POST['conversation_id'] ?? $_GET['id'] ?? null;
+
+            if (!$conversationId) {
+                throw new \Exception('ID de conversation non spécifié.');
+            }
+
             $userId = $_SESSION['user_id'];
             $message = $_POST['message'];
-            $workspaceSlug = $_SESSION['workspace_slug'];
+
+            if (isset($_SESSION['workspace_slug'])) {
+                $workspaceSlug = $_SESSION['workspace_slug'];
+            } else {
+                $stmt = $this->pdo->prepare('SELECT category FROM conversations WHERE id = ?');
+                $stmt->execute([$conversationId]);
+                $result = $stmt->fetch();
+
+                if ($result) {
+                    $workspaceSlug = $result['category'];
+                    $_SESSION['workspace_slug'] = $workspaceSlug;
+                } else {
+                    throw new \Exception('Conversation non trouvée.');
+                }
+            }
 
             $stmt = $this->pdo->prepare('INSERT INTO messages (conversation_id, user_id, message) VALUES (?, ?, ?)');
             $stmt->execute([$conversationId, $userId, $message]);
 
             $chatbotResponse = $this->askChatbot($message, $workspaceSlug);
+
             $stmt = $this->pdo->prepare('INSERT INTO messages (conversation_id, user_id, message) VALUES (?, ?, ?)');
             $stmt->execute([$conversationId, ChatBotConstants::CHAT_BOT_ID, $chatbotResponse->textResponse]);
 
@@ -57,6 +77,8 @@ class ConversationController extends AbstractController
             exit;
         }
     }
+
+
 
     public function endConversation()
     {
@@ -76,7 +98,7 @@ class ConversationController extends AbstractController
             $stmt = $this->pdo->prepare('UPDATE conversations SET rating = ? WHERE id = ?');
             $stmt->execute([$rating, $conversationId]);
 
-            header('Location: /home');
+            header('Location: /conversation?id=' . $conversationId);
             exit;
         }
     }
@@ -84,6 +106,7 @@ class ConversationController extends AbstractController
     public function viewConversation()
     {
         $conversationId = $_GET['id'] ?? null;
+        $userId = $_SESSION['user_id'] ?? null;
         $role = $_SESSION['role'] ?? null;
 
         if (!$conversationId) {
@@ -108,9 +131,9 @@ class ConversationController extends AbstractController
         echo $this->render('conversations/conversation.html.twig', [
             'conversation' => $conversation,
             'messages' => $messages,
+            'user_id' => $userId,
             'chatBotId' => ChatBotConstants::CHAT_BOT_ID,
             'role' => $role,
-
         ]);
     }
 
@@ -143,7 +166,7 @@ class ConversationController extends AbstractController
             return json_decode($response);
         }
 
-        return null; // En cas d'erreur
+        return null;
     }
 
 

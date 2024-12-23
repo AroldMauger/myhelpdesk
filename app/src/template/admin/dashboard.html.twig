@@ -14,7 +14,7 @@
             justify-content: center;
             font-size: 0.9em;
             color:white;
-            width: 50%;
+            width: 100%;
             height: 2rem;
             text-align: center;
         }
@@ -29,14 +29,17 @@
 <body class="dashboard-wrapper">
 <aside>
     <img src="/images/mary.svg" class="logo-dashboard">
-    <a href="/admin">
+    <a href="/admin" class="link-nav-bar">
         <button>Accueil</button>
     </a>
-    <a href="/workspaces">
+    <a href="/workspaces" class="link-nav-bar">
         <button>Espaces de travail</button>
     </a>
-    <a href="/previous">
-        <button>Conversations</button>
+    <a href="/previous" class="link-nav-bar">
+        <button>Conversations administrateur</button>
+    </a>
+    <a href="/all-conversations" class="link-nav-bar">
+        <button>Conversations des utilisateurs</button>
     </a>
 </aside>
 
@@ -49,24 +52,24 @@
     <section class="chatbot-section">
         <h3>Initier une conversation avec le Chatbot</h3>
         <form action="/start-conversation" method="POST">
-            <label for="workspace">Sélectionnez un espace de travail :</label>
-            <select name="workspace_slug" id="workspace" required>
-                {% for workspace in workspaces %}
-                    <option value="{{ workspace.slug }}">{{ workspace.name }}</option>
-                {% endfor %}
-            </select>
+            <div class="select-wrapper">
+                <label for="workspace">Sélectionnez un espace de travail :</label>
+                <select name="workspace_slug" id="workspace" required>
+                    {% if workspaces is empty %}
+                        <option value="">Aucun espace de travail</option>
+                    {% else %}
+                        {% for workspace in workspaces %}
+                            <option value="{{ workspace.slug }}">{{ workspace.name }}</option>
+                        {% endfor %}
+                    {% endif %}
+                </select>
+
+            </div>
+
             <input type="text" name="message" id="chatbot-query" class="chatbot-searchbar" placeholder="Posez votre question..." required>
             <button type="submit" class="chatbot-submit">Envoyer</button>
         </form>
     </section>
-
-{#    <section class="chatbot-section">#}
-{#        <h3>Initier une conversation avec le Chatbot</h3>#}
-{#        <form action="/start-conversation" method="POST">#}
-{#            <input type="text" name="message" id="chatbot-query" class="chatbot-searchbar" placeholder="Posez votre question..." required>#}
-{#            <button type="submit" class="chatbot-submit">Envoyer</button>#}
-{#        </form>#}
-{#    </section>#}
 
 </main>
 </body>

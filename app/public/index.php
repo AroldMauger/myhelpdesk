@@ -19,6 +19,10 @@ $router->map( 'GET', '/home', \App\Controller\HomeController::class . "#home", '
 //Route dashboard for admin
 $router->map( 'GET', '/admin', \App\Controller\AdminController::class . "#home", 'admin' );
 $router->map( 'POST', '/create-workspace', \App\Controller\WorkspaceController::class . "#createWorkspace", 'create_workspace' );
+$router->map('GET', '/all-conversations', \App\Controller\AdminController::class . "#allConversations", 'all_conversations');
+$router->map('POST', '/delete-conversation', \App\Controller\AdminController::class . "#deleteConversation", 'delete_conversations');
+
+
 
 //Route workspaces
 $router->map( 'GET', '/workspaces', \App\Controller\WorkspaceController::class . "#displayWorkspaces", 'workspaces' );
