@@ -145,7 +145,7 @@ class ConversationController extends AbstractController
 
         $postData = json_encode([
             'message' => $userMessage,
-            'mode' => 'chat'
+            'mode' => 'query'
         ]);
 
         $ch = curl_init($apiUrl);
@@ -159,7 +159,6 @@ class ConversationController extends AbstractController
         ]);
 
         $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
         if ($response !== false) {
