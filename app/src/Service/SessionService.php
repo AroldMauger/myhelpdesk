@@ -34,16 +34,8 @@ class SessionService
             session_unset();
             session_destroy();
 
-            header('Location: /login');
+            header('Location: /');
             exit;
         }
     }
 }
-
-
-//getUserId
-//login
-//logout
-// avec sessions PHP
-// sessionStart
-// sessionStop

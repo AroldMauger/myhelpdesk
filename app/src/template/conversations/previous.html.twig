@@ -37,7 +37,7 @@
 <main class="main-dashboard">
     <div class="header-dashboard">
         <h2>Historique de {{ username }}</h2>
-        <a href="/logout">Déconnexion</a>
+        <a href="/logout" class="logout-link">Déconnexion</a>
     </div>
     <section class="chat-conversations">
         <h3>Conversations passées</h3>
@@ -83,8 +83,8 @@
             <p>Aucune conversation.</p>
         {% endif %}
     </section>
-
-
 </main>
+<script src="/js/logout.js"></script>
+
 </body>
 </html>
