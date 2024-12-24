@@ -31,9 +31,6 @@ class WorkspaceController extends AbstractController
         ]);
     }
 
-
-
-
     public function createWorkspace($workspaceTitle) {
         $successMessage = null;
         $errorMessage = null;
@@ -52,10 +49,9 @@ class WorkspaceController extends AbstractController
                 "openAiHistory"=> 20,
                 "openAiPrompt"=> "Custom prompt for responses",
                 "queryRefusalResponse"=> $queryRefusalResponse,
-                "chatMode"=> "chat",
+                "chatMode"=> "query",
                 "topN"=> 4
             ];
-            // Requête CURL
             $ch = curl_init($apiUrl);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_POST, true);
@@ -65,12 +61,10 @@ class WorkspaceController extends AbstractController
             ]);
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 
-            // Exécution de la requête
             $response = curl_exec($ch);
 
             curl_close($ch);
 
-            // Vérification du code de statut HTTP
             if ($response === false) {
                 $errorMessage = 'Une erreur est survenue lors de la création du workspace.';
             } else {
@@ -110,7 +104,6 @@ class WorkspaceController extends AbstractController
             $workspacesData = json_decode($response, true);
             $workspaces = $workspacesData['workspaces'] ?? [];
 
-            // Récupérer les documents pour chaque workspace
             foreach ($workspaces as &$workspace) {
                 $workspace['documents'] = $this->getWorkspaceDocuments($workspace['slug']);
             }
@@ -199,7 +192,6 @@ class WorkspaceController extends AbstractController
             'names' => [$docpath]
         ]);
 
-        // Effectuer la requête DELETE
         $ch = curl_init($apiUrl);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
         curl_setopt($ch, CURLOPT_POSTFIELDS, $deletePayload);
@@ -214,14 +206,12 @@ class WorkspaceController extends AbstractController
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
-        // Vérification de la réponse
         if ($httpCode === 200) {
             $_SESSION['success_message'] = "Document supprimé avec succès.";
         } else {
             $_SESSION['error_message'] = "Erreur lors de la suppression du document.";
         }
 
-        // Redirection après suppression
         return $this->displayWorkspaces();
 
     }
@@ -251,7 +241,6 @@ class WorkspaceController extends AbstractController
 
             $response = curl_exec($ch);
 
-            // Vérifier si la requête a échoué
             if (curl_errno($ch)) {
                 $error_message = 'Erreur cURL: ' . curl_error($ch);
                 curl_close($ch);
@@ -269,6 +258,7 @@ class WorkspaceController extends AbstractController
             } else {
                 $documentLocation = $data['documents'][0]['location'];
                 $this->updateWorkspace($workspaceSlug, $documentLocation);
+                $this->updatePin($workspaceSlug, $documentLocation);
                 $success_message = "Fichier téléchargé avec succès.";
                 $_SESSION['success_message'] = $success_message;
                 return $this->displayWorkspaces();
@@ -313,5 +303,39 @@ class WorkspaceController extends AbstractController
         return $updateHttpCode === 200 && isset($updateData['success']) && $updateData['success'];
     }
 
+    public function updatePin($workspaceSlug, $documentLocation)
+    {
+        if (is_array($workspaceSlug) && isset($workspaceSlug['slug'])) {
+            $workspaceSlug = $workspaceSlug['slug'];
+        } else {
+            $error_message = "Slug non valide ou absent.";
+            $_SESSION['error_message'] = $error_message;
+            return $this->displayWorkspaces();
+        }
+        $updateApiUrl = "http://172.27.144.1:3001/api/v1/workspace/$workspaceSlug/update-pin";
+        $accessToken = getenv('JWT_SECRET');
 
+        $updatePostData = json_encode([
+            'docPath' => $documentLocation,
+            'pinStatus' => true
+        ]);
+
+        $updateCh = curl_init($updateApiUrl);
+        curl_setopt($updateCh, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($updateCh, CURLOPT_POST, true);
+        curl_setopt($updateCh, CURLOPT_HTTPHEADER, [
+            'Authorization: Bearer ' . $accessToken,
+            'Content-Type: application/json',
+            'Accept: application/json',
+        ]);
+        curl_setopt($updateCh, CURLOPT_POSTFIELDS, $updatePostData);
+
+        $updateResponse = curl_exec($updateCh);
+        $updateHttpCode = curl_getinfo($updateCh, CURLINFO_HTTP_CODE);
+        curl_close($updateCh);
+
+        $updateData = json_decode($updateResponse, true);
+
+        return $updateHttpCode === 200 && isset($updateData['success']) && $updateData['success'];
+    }
 }
