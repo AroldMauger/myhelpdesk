@@ -104,9 +104,9 @@ services:
       - ./storage:/app/server/storage
     environment:
       - STORAGE_DIR=/app/server/storage
-      - LLM_BACKEND_URL=${LLM_BACKEND_URL}
-      - MISTRAL_API_KEY=${MISTRAL_API_KEY}
-      - JWT_SECRET=${JWT_SECRET}
+      - LLM_BACKEND_URL={LLM_BACKEND_URL:-}
+      - MISTRAL_API_KEY=${MISTRAL_API_KEY:-}
+      - JWT_SECRET=${JWT_SECRET:-}
     restart: always
     cap_add:
       - SYS_ADMIN
@@ -115,7 +115,7 @@ services:
     image: ollama/ollama
     container_name: ollama
     ports:
-      - "11434:11434" # Port pour accéder à l'API Ollama
+      - "11434:11434"
     volumes:
       - ollama_data:/root/.ollama
     networks:
