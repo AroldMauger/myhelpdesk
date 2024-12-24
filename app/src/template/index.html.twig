@@ -32,7 +32,7 @@
         <h3>Initier une conversation avec le Chatbot</h3>
         <form action="/start-conversation" method="POST">
             <div class="select-wrapper">
-                <label for="workspace">Sélectionnez un espace de travail :</label>
+                <label for="workspace">Sélectionnez un contexte :</label>
                 <select name="workspace_slug" id="workspace" required>
                     {% if workspaces is empty %}
                         <option value="">Aucun espace de travail</option>
