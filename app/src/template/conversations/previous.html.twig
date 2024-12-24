@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <title>MyHelpdesk</title>
+</head>
+<body class="dashboard-wrapper">
+<aside>
+    <img src="/images/mary.svg" class="logo-dashboard">
+    {% if role == 'utilisateur' %}
+        <a href="/home" class="link-nav-bar">
+            <button>Accueil</button>
+        </a>
+        <a href="/previous" class="link-nav-bar">
+            <button>Conversations</button>
+        </a>
+    {% elseif role == 'administrateur' %}
+        <a href="/admin" class="link-nav-bar">
+            <button>Accueil</button>
+        </a>
+        <a href="/workspaces" class="link-nav-bar">
+            <button>Espaces de travail</button>
+        </a>
+        <a href="/previous" class="link-nav-bar">
+            <button>Conversations administrateur</button>
+        </a>
+        <a href="/all-conversations" class="link-nav-bar">
+            <button>Conversations des utilisateurs</button>
+        </a>
+    {% endif %}
+</aside>
+
+<main class="main-dashboard">
+    <div class="header-dashboard">
+        <h2>Historique de {{ username }}</h2>
+        <a href="/logout" class="logout-link">Déconnexion</a>
+    </div>
+    <section class="chat-conversations">
+        <h3>Conversations passées</h3>
+        {% if conversations %}
+            <table class="conversations-table">
+                <thead>
+                <tr>
+                    <th>Sujet</th>
+                    <th>Date</th>
+                    <th>Note</th>
+                    {% if role == 'administrateur' %}
+                        <th>Action</th>
+                    {% endif %}
+                </tr>
+                </thead>
+                <tbody>
+                {% for conversation in conversations %}
+                    <tr>
+                        <td>
+                            <a href="/conversation?id={{ conversation.id }}">{{ conversation.subject }}</a>
+                        </td>
+                        <td>{{ conversation.created_at | date('d/m/Y H:i') }}</td>
+                        <td>
+                            {% if conversation.rating %}
+                                {% for i in 1..conversation.rating %}
+                                    &#9733;
+                                {% endfor %}
+                            {% endif %}
+                        </td>
+                        {% if role == 'administrateur' %}
+                            <td>
+                                <form action="/delete-conversation" method="POST" style="margin: 0;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette conversation ?');">
+                                    <input type="hidden" name="conversation_id" value="{{ conversation.id }}">
+                                    <button type="submit" class="btn-delete">Supprimer</button>
+                                </form>
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>Aucune conversation.</p>
+        {% endif %}
+    </section>
+</main>
+<script src="/js/logout.js"></script>
+
+</body>
+</html>

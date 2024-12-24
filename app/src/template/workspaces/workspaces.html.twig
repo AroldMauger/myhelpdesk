@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/css/workspace.css">
+    <title>MyHelpdesk</title>
+    <style>
+        .display-message {
+            display: flex;
+            align-content: center;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+            color:white;
+            width: 100%;
+            height: 2rem;
+            text-align: center;
+        }
+        .alert-danger {
+            background: red;
+        }
+        .alert-success {
+            background: green;
+        }
+    </style>
+</head>
+<body class="dashboard-wrapper">
+<aside>
+    <img src="/images/mary.svg" class="logo-dashboard">
+    <a href="/admin" class="link-nav-bar">
+        <button>Accueil</button>
+    </a>
+    <a href="/workspaces" class="link-nav-bar">
+        <button>Espaces de travail</button>
+    </a>
+    <a href="/previous" class="link-nav-bar">
+        <button>Conversations administrateur</button>
+    </a>
+    <a href="/all-conversations" class="link-nav-bar">
+        <button>Conversations des utilisateurs</button>
+    </a>
+</aside>
+
+<main class="main-dashboard">
+    <div class="header-dashboard">
+        <h2>Gestion des espaces de travail de MyHelpDesk</h2>
+        <a href="/logout" class="logout-link">Déconnexion</a>
+    </div>
+
+    {% if success_message %}
+        <div class="display-message alert alert-success" role="alert">
+            <span>{{ success_message | raw }}</span>
+        </div>
+    {% endif %}
+    {% if error_message %}
+        <div class="display-message alert alert-danger" role="alert">
+            <span> {{ error_message }}</span>
+        </div>
+    {% endif %}
+
+    <section class="workspaces-section">
+        <h3>Créer un espace de travail</h3>
+
+        <form action="/create-workspace" method="POST" enctype="multipart/form-data" class="upload-form">
+            <label for="title">Nom de l'espace de travail</label>
+            <input type="text" name="title" id="title" required>
+            <button type="submit" class="chatbot-submit">Créer</button>
+        </form>
+    </section>
+    {% if workspaces is empty %}
+        <p>Aucun espace de travail trouvé.</p>
+    {% else %}
+        <section class="workspace-card-container">
+
+        {% for workspace in workspaces %}
+            <div class="workspace-card">
+                <form class="form-delete" action="/delete/{{ workspace.slug }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet espace de travail ?');">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <button type="submit" class="delete-btn">X</button>
+                </form>
+                <h2>{{ workspace.name }}</h2>
+
+                {% if workspace.documents is defined and workspace.documents is not empty %}
+                    <h3>Documents :</h3>
+                    <ul class="document-list">
+                        {% for document in workspace.documents %}
+                            <li class="document-item">
+                                <div class="document-header">
+                                    <span class="document-title">{{ document.metadata.title ?? 'Titre inconnu' }}</span>
+                                    <form action="/delete-document/{{ document.docpath | url_encode }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce document ?');">
+                                        <input type="hidden" name="_method" value="DELETE">
+                                        <button class="delete-btn">X</button>
+                                    </form>
+                                </div>
+                                <div class="document-info">
+                                    <span class="document-date">Créé le : {{ document.createdAt|date('d/m/Y H:i:s') }}</span>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>Aucun document disponible pour cet espace de travail.</p>
+                {% endif %}
+
+                <form action="/upload-document/{{ workspace.slug }}" method="POST" enctype="multipart/form-data" class="upload-file-form">
+                    <label for="document">Ajouter document</label>
+                    <input type="file" name="document" id="document" required>
+                    <button type="submit" class="upload-submit">Télécharger</button>
+                </form>
+            </div>
+        {% endfor %}
+    {% endif %}
+        </section>
+
+</main>
+<script src="/js/logout.js"></script>
+</body>
+</html>

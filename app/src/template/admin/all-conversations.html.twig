@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/css/admin.css">
+
+    <title>MyHelpdesk</title>
+</head>
+<body class="dashboard-wrapper">
+<aside>
+    <img src="/images/mary.svg" class="logo-dashboard">
+    {% if role == 'utilisateur' %}
+        <a href="/home" class="link-nav-bar">
+            <button>Accueil</button>
+        </a>
+        <a href="/previous" class="link-nav-bar">
+            <button>Conversations</button>
+        </a>
+    {% elseif role == 'administrateur' %}
+        <a href="/admin" class="link-nav-bar">
+            <button>Accueil</button>
+        </a>
+        <a href="/workspaces" class="link-nav-bar">
+            <button>Espaces de travail</button>
+        </a>
+        <a href="/previous" class="link-nav-bar">
+            <button>Conversations administrateur</button>
+        </a>
+        <a href="/all-conversations" class="link-nav-bar">
+            <button>Conversations des utilisateurs</button>
+        </a>
+    {% endif %}
+</aside>
+<main class="main-dashboard">
+    <div class="header-dashboard">
+        <h2>Tableau des Conversations</h2>
+        <a href="/logout" class="logout-link">Déconnexion</a>
+    </div>
+
+    <section class="conversations-table">
+        <table>
+            <thead>
+            <tr>
+                <th>Utilisateur</th>
+                <th>Catégorie</th>
+                <th>Sujet</th>
+                <th>Date de création</th>
+                <th>Note</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for conversation in conversations %}
+                <tr>
+                    <td>{{ conversation.username }}</td>
+                    <td>{{ conversation.category }}</td>
+                    <td><a href="/conversation?id={{ conversation.id }}">{{ conversation.subject }}</a></td>
+                    <td>{{ conversation.created_at | date('d/m/Y \à H:i') }}</td>
+                    <td>
+                        {% if conversation.rating %}
+                            {% for i in 1..conversation.rating %}
+                                &#9733;
+                            {% endfor %}
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </section>
+</main>
+
+<script src="/js/logout.js"></script>
+</body>
+</html>

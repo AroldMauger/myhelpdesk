@@ -1,6 +1,8 @@
 version: "3.8"
 volumes:
   mysqldata:
+  ollama_data:
+  anythingllm_data:
 
 networks:
   default:
@@ -16,6 +18,8 @@ services:
       DATABASE_DSN: mysql:dbname=myhelpdesk;host=mysql
       DATABASE_USER: user
       DATABASE_PASSWORD: password
+      MISTRAL_API_KEY: ${MISTRAL_API_KEY:-}
+      JWT_SECRET: ${JWT_SECRET:-}
     cap_add:
       - SYS_PTRACE
     volumes:
@@ -68,6 +72,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: myhelpdesk
+      MYSQL_HOST: database
       MYSQL_USER: user
       MYSQL_PASSWORD: password
     ports:
@@ -86,3 +91,33 @@ services:
       PMA_HOST: database
       PMA_USER: 'root'
       PMA_PASSWORD: 'password'
+    networks:
+      - default
+
+
+  anythingllm:
+    image: mintplexlabs/anythingllm
+    container_name: anythingllm
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./storage:/app/server/storage
+    environment:
+      - STORAGE_DIR=/app/server/storage
+      - LLM_BACKEND_URL={LLM_BACKEND_URL:-}
+      - MISTRAL_API_KEY=${MISTRAL_API_KEY:-}
+      - JWT_SECRET=${JWT_SECRET:-}
+    restart: always
+    cap_add:
+      - SYS_ADMIN
+
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - default
+    command: ""

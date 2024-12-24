@@ -1,1 +1,54 @@
-Salut !
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin.css">
+
+    <title>MyHelpdesk</title>
+</head>
+<body class="dashboard-wrapper">
+<aside>
+    <img src="/images/mary.svg" class="logo-dashboard">
+    <a href="/home" class="link-nav-bar">
+        <button>Accueil</button>
+    </a>
+    <a href="/previous" class="link-nav-bar">
+        <button>Conversations</button>
+    </a>
+
+</aside>
+
+
+<main class="main-dashboard">
+    <div class="header-dashboard">
+        <h2>Bienvenue {{ username }} !</h2>
+        <a href="/logout" class="logout-link">Déconnexion</a>
+    </div>
+
+    <section class="chatbot-section">
+        <h3>Initier une conversation avec le Chatbot</h3>
+        <form action="/start-conversation" method="POST">
+            <div class="select-wrapper">
+                <label for="workspace">Sélectionnez un contexte :</label>
+                <select name="workspace_slug" id="workspace" required>
+                    {% if workspaces is empty %}
+                        <option value="">Aucun espace de travail</option>
+                    {% else %}
+                        {% for workspace in workspaces %}
+                            <option value="{{ workspace.slug }}">{{ workspace.name }}</option>
+                        {% endfor %}
+                    {% endif %}
+                </select>
+            </div>
+            <input type="text" name="message" id="chatbot-query" class="chatbot-searchbar" placeholder="Posez votre question..." required>
+            <button type="submit" class="chatbot-submit">Envoyer</button>
+        </form>
+    </section>
+
+</main>
+<script src="/js/logout.js"></script>
+</body>
+</html>

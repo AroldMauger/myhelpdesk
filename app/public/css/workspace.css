@@ -1,0 +1,358 @@
+/* LOGIN AND SIGNUP */
+* {
+    font-family: Lato,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,"Apple Color Emoji","Segoe UI Emoji",Segoe UI Symbol,"Noto Color Emoji";
+}
+/* DASHBOARD */
+
+.dashboard-wrapper {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    color: rgb(27 74 147);
+}
+
+aside {
+    display: flex;
+    flex-direction: column;
+    gap:3rem;
+    background: rgb(247, 250, 252);
+    padding-block: 20px;
+    padding-inline: 10px;
+    border-radius: 10px;
+    width: 180px;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    align-items: center;
+}
+
+aside a {
+    width: 100%;
+}
+
+aside button{
+    width: 100%;
+}
+
+.link-nav-bar button {
+    width: 100%;
+    text-align: start;
+    background-color:#fcbc05;
+    border: none;
+    line-height: 1rem;
+    border-radius: .25rem;
+    color: rgb(27 74 147);
+    font-weight: 600;
+    min-height: 48px;
+    font-size:16px;
+}
+
+.link-nav-bar:hover {
+    cursor: pointer;
+    color:white;
+}
+
+.link-nav-bar button:hover {
+    cursor: pointer;
+    color:white;
+}
+
+.logo-dashboard {
+    width: 70%;
+    margin-bottom: 20px;
+}
+
+.main-dashboard {
+    margin-left: 200px;
+    padding: 20px;
+    flex: 1;
+}
+
+.header-dashboard {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    align-content: center;
+}
+
+.header-dashboard a {
+    text-decoration: none;
+    color: rgb(27 74 147);
+}
+
+.chatbot-section {
+    margin-top: 40px;
+    padding: 30px;
+    background: #f7fafa;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.chatbot-section h3 {
+    font-size: 24px;
+    color: #1b4a93;
+    margin-bottom: 20px;
+    margin-top: 0px;
+}
+
+.upload-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 400px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.upload-form label {
+    font-size: 16px;
+    font-weight: bold;
+    color: rgb(27 74 147);
+}
+
+.upload-form input[type="text"], .upload-form input[type="file"] {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    font-size: 16px;
+}
+
+.upload-form input[type="text"] {
+    width: 90%;
+}
+
+.upload-form input[type="file"] {
+    width: 100%;
+}
+
+.upload-form button {
+    align-self: center;
+    background-color: rgb(27 74 147);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.upload-form button:hover {
+    background-color: #faba00;
+}
+
+/* Workspaces Section */
+
+/* Titre des workspaces */
+.workspaces-section h3 {
+    font-size: 24px;
+    color: #1b4a93;
+    text-align: start;
+    margin-bottom: 20px;
+}
+
+/* Conteneur pour les cartes des workspaces */
+.workspaces-section {
+    margin-top: 40px;
+    background-color: #f7fafa;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+}
+
+.cards-wrapper {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 30px;
+}
+
+.workspace-card-container {
+    margin-top:20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap : 20px;
+    width: 100%;
+}
+/* Style pour chaque carte de workspace */
+.workspace-card {
+    font-size: 14px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box; /* Inclut les padding et marges dans la largeur totale */
+    width: 30%;
+}
+
+.workspace-card p {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+/* Formulaire d'upload pour chaque espace de travail */
+.upload-file-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.upload-file-form label {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+}
+
+.upload-file-form input[type="file"] {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+.upload-file-form button {
+    padding: 10px 15px;
+    background-color: #1b4a93;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    align-self: center;
+    transition: background-color 0.3s ease;
+}
+
+.upload-file-form button:hover {
+    background-color: #faba00;
+}
+
+
+.form-delete {
+    display: flex;
+    justify-content: flex-end;
+}
+.form-delete button {
+    background-color: #1b4a93;
+    color:white;
+    border: none;
+}
+.form-delete button:hover {
+    background-color: grey;
+    cursor: pointer;
+}
+
+/* Design responsive pour les petits écrans */
+@media (max-width: 768px) {
+    .workspace-card {
+        flex: 1 1 100%; /* Sur les petits écrans, chaque carte occupe toute la largeur */
+    }
+
+    .workspaces-section h3 {
+        font-size: 22px;
+    }
+}
+
+
+.display-message {
+    display: flex;
+    align-content: center;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9em;
+    color: white;
+    width: 50%;
+    height: 2rem;
+    text-align: center;
+}
+
+.alert-danger {
+    background: red;
+}
+
+.alert-success {
+    background: green;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .chatbot-section, .upload-form {
+        padding: 15px;
+    }
+
+    .workspaces-section li {
+        padding: 15px;
+    }
+
+    .upload-form, .upload-file-form {
+        gap: 10px;
+    }
+}
+
+/* Style de la liste des documents */
+.document-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.document-item {
+    display: flex;
+    flex-direction: column;
+    background-color: #f9f9f9;
+    margin: 10px 0;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+/* Header du document */
+.document-header {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.document-title {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.delete-btn {
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    padding: 0;
+    transition: background-color 0.3s ease;
+}
+
+.delete-btn:hover {
+    background-color: #e60000;
+    cursor: pointer;
+}
+
+.document-info {
+    font-size: 14px;
+    color: #555;
+}
+
+/* Style global pour les messages */
+p {
+    font-size: 14px;
+    color: #888;
+}
