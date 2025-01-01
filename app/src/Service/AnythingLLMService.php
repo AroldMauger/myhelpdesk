@@ -5,6 +5,7 @@ namespace App\Service;
 class AnythingLLMService
 {
     private $apiBaseUrl;
+
     private $accessToken;
 
     public function __construct()
@@ -21,12 +22,12 @@ class AnythingLLMService
         $data = [
             'name' => $workspaceTitle,
             "similarityThreshold" => 0.7,
-            "openAiTemp"=> 0.7,
-            "openAiHistory"=> 20,
-            "openAiPrompt"=> "Custom prompt for responses",
-            "queryRefusalResponse"=> $queryRefusalResponse,
-            "chatMode"=> "query",
-            "topN"=> 4
+            "openAiTemp" => 0.7,
+            "openAiHistory" => 20,
+            "openAiPrompt" => "Custom prompt for responses",
+            "queryRefusalResponse" => $queryRefusalResponse,
+            "chatMode" => "query",
+            "topN" => 4,
         ];
         $ch = curl_init($this->apiBaseUrl . 'workspace/new');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -70,7 +71,7 @@ class AnythingLLMService
         ]);
 
         $postFields = [
-            'file' => new \CURLFile($file['tmp_name'], $file['type'], $file['name'])
+            'file' => new \CURLFile($file['tmp_name'], $file['type'], $file['name']),
         ];
         curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
 
@@ -90,7 +91,7 @@ class AnythingLLMService
         $updatePostData = json_encode([
             'adds' => [
                 $documentLocation,
-            ]
+            ],
         ]);
 
         $updateCh = curl_init($this->apiBaseUrl . "workspace/$workspaceSlug/update-embeddings");
@@ -117,7 +118,7 @@ class AnythingLLMService
 
         $updatePostData = json_encode([
             'docPath' => $documentLocation,
-            'pinStatus' => true
+            'pinStatus' => true,
         ]);
 
         $updateCh = curl_init($this->apiBaseUrl . "workspace/$workspaceSlug/update-pin");
@@ -143,7 +144,7 @@ class AnythingLLMService
 
         $docpath = urldecode($params['docpath']);
         $deletePayload = json_encode([
-            'names' => [$docpath]
+            'names' => [$docpath],
         ]);
 
         $ch = curl_init($this->apiBaseUrl . 'system/remove-documents');
@@ -170,7 +171,7 @@ class AnythingLLMService
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'accept: */*',
-            'Authorization: Bearer ' . $this->accessToken
+            'Authorization: Bearer ' . $this->accessToken,
         ]);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FAILONERROR, true);
@@ -201,7 +202,7 @@ class AnythingLLMService
 
             $postData = json_encode([
                 'message' => $userMessage,
-                'mode' => 'query'
+                'mode' => 'query',
             ]);
 
             $ch = curl_init($this->apiBaseUrl . "workspace/$workspaceSlug/chat");
@@ -222,6 +223,5 @@ class AnythingLLMService
             }
 
             return null;
-
     }
 }

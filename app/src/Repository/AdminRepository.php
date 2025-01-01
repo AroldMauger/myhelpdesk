@@ -32,6 +32,29 @@ class AdminRepository extends AbstractController
         $stmt = $this->pdo->prepare('DELETE FROM conversations WHERE id = :id');
         $stmt->bindParam(':id', $conversationId, \PDO::PARAM_INT);
         $stmt->execute();
-
     }
+
+    public function getUsers() {
+        $stmt = $this->pdo->prepare('SELECT * FROM users');
+        $stmt->execute();
+        $users = $stmt->fetchAll();
+
+        return $users;
+    }
+
+    public function updateRole($userId, $userRole) {
+        if($userRole === "utilisateur") {
+            $newRole = "administrateur";
+        } else {
+            $newRole = "utilisateur";
+        }
+
+        $stmt = $this->pdo->prepare('UPDATE users SET role = :role WHERE id = :id');
+        $stmt->bindParam(':role', $newRole, \PDO::PARAM_STR);
+        $stmt->bindParam(':id', $userId, \PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $newRole;
+    }
+
 }

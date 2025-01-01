@@ -39,7 +39,6 @@ class ConversationController extends AbstractController
         }
     }
 
-
     public function addMessage() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sessionService = new SessionService();
@@ -47,7 +46,7 @@ class ConversationController extends AbstractController
 
             $conversationId = $_POST['conversation_id'] ?? $_GET['id'] ?? null;
 
-            if (!$conversationId) {
+            if (! $conversationId) {
                 throw new \Exception('ID de conversation non spécifié.');
             }
 
@@ -68,8 +67,6 @@ class ConversationController extends AbstractController
         }
     }
 
-
-
     public function endConversation()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -84,9 +81,9 @@ class ConversationController extends AbstractController
                 header('Location: /conversation?id=' . $conversationId);
                 exit;
             }
+
             $repository = new ConversationRepository();
             $repository->endConversation($rating, $conversationId);
-
 
             header('Location: /conversation?id=' . $conversationId);
             exit;
@@ -99,7 +96,7 @@ class ConversationController extends AbstractController
         $userId = $_SESSION['user_id'] ?? null;
         $role = $_SESSION['role'] ?? null;
 
-        if (!$conversationId) {
+        if (! $conversationId) {
             header('Location: /home');
             exit;
         }
@@ -118,7 +115,4 @@ class ConversationController extends AbstractController
             'role' => $role,
         ]);
     }
-
-
-
 }

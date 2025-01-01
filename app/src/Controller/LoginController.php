@@ -2,8 +2,6 @@
 
 namespace App\Controller;
 
-use App\Service\SessionService;
-
 class LoginController extends AbstractController
 {
     public function displayLogin(): void

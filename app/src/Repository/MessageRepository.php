@@ -12,7 +12,6 @@ class MessageRepository extends AbstractController
         $stmt = $this->pdo->prepare('INSERT INTO messages (conversation_id, user_id, message) VALUES (?, ?, ?)');
 
         $stmt->execute([$conversationId, ChatBotConstants::CHAT_BOT_ID, $chatbotResponse['textResponse']]);
-
     }
 
     public function addUserMessage($conversationId, $userId, $message) {

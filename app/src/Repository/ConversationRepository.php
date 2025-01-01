@@ -28,7 +28,6 @@ class ConversationRepository extends AbstractController
 
         $stmt = $this->pdo->prepare('UPDATE conversations SET rating = ? WHERE id = ?');
         $stmt->execute([$rating, $conversationId]);
-
     }
 
     public function getConversation($conversationId) {

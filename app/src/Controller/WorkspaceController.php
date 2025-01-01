@@ -6,7 +6,7 @@ use App\Service\AnythingLLMService;
 
 class WorkspaceController extends AbstractController
 {
-    public function displayWorkspaces():void {
+    public function displayWorkspaces(): void {
         $success_message = isset($_SESSION['success_message']) ? $_SESSION['success_message'] : null;
         $error_message = isset($_SESSION['error_message']) ? $_SESSION['error_message'] : null;
 
@@ -22,22 +22,22 @@ class WorkspaceController extends AbstractController
         ]);
     }
 
-    public function createWorkspace($workspaceTitle) :void {
+    public function createWorkspace($workspaceTitle): void {
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
             $workspaceTitle = $_POST['title'];
 
             $service = new AnythingLLMService();
 
             $response = $service->createWorkspace($workspaceTitle);
 
-            if ($response === false ) {
+            if ($response === false) {
                 $errorMessage = 'Une erreur est survenue lors de la création du workspace.';
                 $_SESSION['error_message'] = $errorMessage;
                 $this->displayWorkspaces();
                 return;
             }
+
             $successMessage = 'Espace de travail créé avec succès !';
             $_SESSION['success_message'] = $successMessage;
             $this->displayWorkspaces();
@@ -59,9 +59,9 @@ class WorkspaceController extends AbstractController
 
             return $workspaces;
         }
+
         return [];
     }
-
 
     private function getWorkspaceDocuments($slug) {
 
@@ -74,6 +74,7 @@ class WorkspaceController extends AbstractController
                 return $workspaceData['workspace'][0]['documents'];
             }
         }
+
         return [];
     }
 
@@ -82,9 +83,9 @@ class WorkspaceController extends AbstractController
         if (is_array($workspaceSlug) && isset($workspaceSlug['slug'])) {
             $workspaceSlug = $workspaceSlug['slug'];
         }
+
         $service = new AnythingLLMService();
         $response = $service->deleteWorkspace($workspaceSlug);
-
 
         if ($response === false || empty($response)) {
             $error_message = "Erreur lors de la suppression de l'espace de travail.";
@@ -102,7 +103,6 @@ class WorkspaceController extends AbstractController
         $service = new AnythingLLMService();
         $httpCode = $service->deleteDocument($params);
 
-
         if ($httpCode === 200) {
             $_SESSION['success_message'] = "Document supprimé avec succès.";
         } else {
@@ -110,9 +110,7 @@ class WorkspaceController extends AbstractController
         }
 
         $this->displayWorkspaces();
-
     }
-
 
     public function upload($workspaceSlug)
     {

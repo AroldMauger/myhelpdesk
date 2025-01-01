@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Service;
 
 class SessionService
@@ -35,13 +36,14 @@ class SessionService
         if(isset($_SESSION['username'])) {
             return $_SESSION['username'];
         }
+
         return null;
     }
+
     public function logout()
     {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
-
 
             session_unset();
             session_destroy();

@@ -372,19 +372,21 @@ aside span{
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     padding: 20px;
     overflow-x: auto;
+    font-size: 14px;
+
 }
 
 .conversations-table table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 16px;
+    font-size: 14px;
     color: #333;
 }
 
 .conversations-table th,
 .conversations-table td {
     text-align: left;
-    padding: 12px 15px;
+    padding: 8px 11px;
     border-bottom: 1px solid #ddd;
 }
 
@@ -415,9 +417,7 @@ aside span{
     text-decoration: underline;
 }
 
-.conversations-table td:last-child {
-    text-align: center;
-}
+
 
 .conversations-table .rating-stars {
     color: rgba(250, 190, 0);
@@ -438,4 +438,20 @@ aside span{
 
 .btn-delete:hover {
     background-color: #e53935;
+}
+
+
+.btn-update {
+    background-color: rgba(250, 190, 0);
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-update:hover {
+    cursor: pointer
 }

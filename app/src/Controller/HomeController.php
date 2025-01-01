@@ -2,32 +2,29 @@
 
 namespace App\Controller;
 
-use App\Controller\WorkspaceController;
 use App\Repository\ConversationRepository;
-use App\Service\SessionService;
 
 class HomeController extends AbstractController
 {
-
     public function landingPage() {
         echo $this->render('landing-page.html.twig');
     }
 
-    public function home():void {
+    public function home(): void {
 
-        if (!$this->sessionService->isAuthenticated()) {
+        if (! $this->sessionService->isAuthenticated()) {
             header('Location: /login');
             exit;
         }
+
         $workspaceController = new WorkspaceController();
         $workspaces = $workspaceController->getWorkspaces();
 
         echo $this->render('index.html.twig', [
             'username' => $this->sessionService->getUserName(),
-            'workspaces' => $workspaces
+            'workspaces' => $workspaces,
         ]);
     }
-
 
     public function previousConversations() {
 
@@ -38,7 +35,6 @@ class HomeController extends AbstractController
 
                     $repository = new ConversationRepository();
                     $conversations = $repository->getPreviousConversations($userId);
-
                 } else {
                     header('Location: /login');
                     exit;
@@ -51,5 +47,4 @@ class HomeController extends AbstractController
                     'role' => $role,
                 ]);
             }
-
 }

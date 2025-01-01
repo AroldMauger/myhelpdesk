@@ -3,13 +3,15 @@
 namespace App\Controller;
 
 use App\Service\SessionService;
-use Twig\Environment;
 use PDO;
+use Twig\Environment;
 
 abstract class AbstractController
 {
     protected Environment $twig;
+
     protected PDO $pdo;
+
     protected SessionService $sessionService;
 
     public function __construct()

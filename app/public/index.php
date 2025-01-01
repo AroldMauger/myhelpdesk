@@ -20,8 +20,10 @@ $router->map( 'GET', '/home', \App\Controller\HomeController::class . "#home", '
 
 //Route dashboard for admin
 $router->map('GET', '/admin', \App\Controller\AdminController::class . "#home", 'admin' );
+$router->map('GET', '/users', \App\Controller\AdminController::class . "#displayUsers", 'display_users' );
 $router->map('GET', '/all-conversations', \App\Controller\AdminController::class . "#allConversations", 'all_conversations');
 $router->map('POST', '/delete-conversation', \App\Controller\AdminController::class . "#deleteConversation", 'delete_conversations');
+$router->map('POST', '/update-role', \App\Controller\AdminController::class . "#updateRole", 'update_role' );
 
 //Route workspaces for admin
 $router->map('GET', '/workspaces', \App\Controller\WorkspaceController::class . "#displayWorkspaces", 'workspaces' );

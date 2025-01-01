@@ -17,5 +17,12 @@
         "ext-pdo": "*",
         "ext-curl": "*",
         "ext-fileinfo": "*"
+    },
+    "scripts": {
+        "ecs": "vendor/bin/ecs check src/ --config ./ecs.php",
+        "ecs-fix": "./vendor/bin/ecs check src/ --config ./ecs.php --fix"
+    },
+    "require-dev": {
+        "symplify/easy-coding-standard": "^12.5"
     }
 }
