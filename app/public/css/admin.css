@@ -99,29 +99,36 @@ aside a {
     width: 100%;
 }
 
-aside button{
+aside span{
     width: 100%;
 }
 
-.link-nav-bar button {
+.link-nav-bar  {
+    display: flex;
+    align-items: center;
+    align-content: center;
+    padding-left:4px ;
+    text-decoration: none;
     width: 100%;
     text-align: start;
-    background-color:#fcbc05;
     border: none;
     line-height: 1rem;
     border-radius: .25rem;
-    color: rgb(27 74 147);
     font-weight: 600;
     min-height: 48px;
     font-size:16px;
+    background-color:#fcbc05;
+    color: rgb(27 74 147);
 }
+
+
 
 .link-nav-bar:hover {
     cursor: pointer;
     color:white;
 }
 
-.link-nav-bar button:hover {
+.link-nav-bar span:hover {
     cursor: pointer;
     color:white;
 }
@@ -365,19 +372,21 @@ aside button{
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     padding: 20px;
     overflow-x: auto;
+    font-size: 14px;
+
 }
 
 .conversations-table table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 16px;
+    font-size: 14px;
     color: #333;
 }
 
 .conversations-table th,
 .conversations-table td {
     text-align: left;
-    padding: 12px 15px;
+    padding: 8px 11px;
     border-bottom: 1px solid #ddd;
 }
 
@@ -408,9 +417,7 @@ aside button{
     text-decoration: underline;
 }
 
-.conversations-table td:last-child {
-    text-align: center;
-}
+
 
 .conversations-table .rating-stars {
     color: rgba(250, 190, 0);
@@ -431,4 +438,20 @@ aside button{
 
 .btn-delete:hover {
     background-color: #e53935;
+}
+
+
+.btn-update {
+    background-color: rgba(250, 190, 0);
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-update:hover {
+    cursor: pointer
 }

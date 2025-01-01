@@ -103,30 +103,50 @@
             background-color: #45a049;
         }
 
+        .link-nav-bar  {
+            display: flex;
+            align-items: center;
+            align-content: center;
+            padding-left:4px ;
+            text-decoration: none;
+            width: 100%;
+            text-align: start;
+            border: none;
+            line-height: 1rem;
+            border-radius: .25rem;
+            font-weight: 600;
+            min-height: 48px;
+            font-size:16px;
+            background-color:#fcbc05;
+            color: rgb(27 74 147);
+        }
     </style>
 </head>
 <body class="dashboard-wrapper">
 <aside>
-    <img src="/images/mary.svg" class="logo-dashboard">
+    <img src="/images/mary.svg" class="logo-dashboard" alt="logo de l'entreprise Mary">
     {% if role == 'utilisateur' %}
         <a href="/home" class="link-nav-bar">
-            <button>Accueil</button>
+            <span>Accueil</span>
         </a>
         <a href="/previous" class="link-nav-bar">
-            <button>Conversations</button>
+            <span>Conversations</span>
         </a>
     {% elseif role == 'administrateur' %}
         <a href="/admin" class="link-nav-bar">
-            <button>Accueil</button>
+            <span>Accueil</span>
         </a>
         <a href="/workspaces" class="link-nav-bar">
-            <button>Espaces de travail</button>
+            <span>Espaces de travail</span>
         </a>
         <a href="/previous" class="link-nav-bar">
-            <button>Conversations administrateur</button>
+            <span>Conversations administrateur</span>
         </a>
         <a href="/all-conversations" class="link-nav-bar">
-            <button>Conversations des utilisateurs</button>
+            <span>Conversations des utilisateurs</span>
+        </a>
+        <a href="/users" class="link-nav-bar">
+            <span>Gestion des utilisateurs</span>
         </a>
     {% endif %}
 

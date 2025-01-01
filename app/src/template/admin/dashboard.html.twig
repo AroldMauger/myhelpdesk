@@ -24,22 +24,42 @@
         .alert-success {
             background: green;
         }
+        .link-nav-bar  {
+            display: flex;
+            align-items: center;
+            align-content: center;
+            padding-left:4px ;
+            text-decoration: none;
+            width: 100%;
+            text-align: start;
+            border: none;
+            line-height: 1rem;
+            border-radius: .25rem;
+            font-weight: 600;
+            min-height: 48px;
+            font-size:16px;
+            background-color:#fcbc05;
+            color: rgb(27 74 147);
+        }
     </style>
 </head>
 <body class="dashboard-wrapper">
 <aside>
-    <img src="/images/mary.svg" class="logo-dashboard">
+    <img src="/images/mary.svg" class="logo-dashboard" alt="logo de l'entreprise Mary">
     <a href="/admin" class="link-nav-bar">
-        <button>Accueil</button>
+        <span>Accueil</span>
     </a>
     <a href="/workspaces" class="link-nav-bar">
-        <button>Espaces de travail</button>
+        <span>Espaces de travail</span>
     </a>
     <a href="/previous" class="link-nav-bar">
-        <button>Conversations administrateur</button>
+        <span>Conversations administrateur</span>
     </a>
     <a href="/all-conversations" class="link-nav-bar">
-        <button>Conversations des utilisateurs</button>
+        <span>Conversations des utilisateurs</span>
+    </a>
+    <a href="/users" class="link-nav-bar">
+        <span>Gestion des utilisateurs</span>
     </a>
 </aside>
 
@@ -53,8 +73,8 @@
         <h3>Initier une conversation avec le Chatbot</h3>
         <form action="/start-conversation" method="POST">
             <div class="select-wrapper">
-                <label for="workspace">Sélectionnez un contexte :</label>
                 <select name="workspace_slug" id="workspace" required>
+                    <option value="" disabled selected>Sélectionnez un contexte</option>
                     {% if workspaces is empty %}
                         <option value="">Aucun espace de travail</option>
                     {% else %}

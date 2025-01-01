@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Controller;
-use App\Controller\WorkspaceController;
+use App\Repository\AdminRepository;
 
 class AdminController extends AbstractController
 {
@@ -13,47 +13,32 @@ class AdminController extends AbstractController
             header('Location: /login');
             exit;
         }
+
         $workspaceController = new WorkspaceController();
         $workspaces = $workspaceController->getWorkspaces();
 
         echo $this->render('admin/dashboard.html.twig', [
             'username' => $username,
-            'workspaces' => $workspaces
+            'workspaces' => $workspaces,
         ]);
     }
 
     public function allConversations()
     {
         if (isset($_SESSION['user_id'])) {
-
             $role = $_SESSION['role'];
 
             if ($role !== 'administrateur') {
-                // Redirige si l'utilisateur n'est pas administrateur
                 header('Location: /login');
                 exit;
             }
 
-            $stmt = $this->pdo->prepare('
-        SELECT 
-            conversations.id, 
-            conversations.category, 
-            conversations.subject, 
-            conversations.created_at, 
-            conversations.rating, 
-            users.username 
-        FROM conversations 
-        JOIN users ON conversations.user_id = users.id 
-        ORDER BY conversations.created_at DESC
-    ');
+            $repository = new AdminRepository();
+            $conversations = $repository->allConversations();
 
-            $stmt->execute();
-            $conversations = $stmt->fetchAll();
-
-            // Passer les données dans la vue
             echo $this->render('admin/all-conversations.html.twig', [
                 'conversations' => $conversations,
-                'role' => $role
+                'role' => $role,
             ]);
         }
     }
@@ -71,9 +56,8 @@ class AdminController extends AbstractController
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $conversationId = $_POST['conversation_id'];
 
-                $stmt = $this->pdo->prepare('DELETE FROM conversations WHERE id = :id');
-                $stmt->bindParam(':id', $conversationId, \PDO::PARAM_INT);
-                $stmt->execute();
+                $repository = new AdminRepository();
+                $repository->deleteConversation($conversationId);
 
                 header('Location: /previous');
                 exit;
@@ -84,5 +68,40 @@ class AdminController extends AbstractController
         }
     }
 
+    public function displayUsers()
+    {
+        if (isset($_SESSION['user_id'])) {
+            $role = $_SESSION['role'];
+            $userId = $_SESSION['user_id'];
+
+            if ($role !== 'administrateur') {
+                header('Location: /login');
+                exit;
+            }
+
+            $repository = new AdminRepository();
+            $users = $repository->getUsers();
+
+            echo $this->render('admin/users.html.twig', [
+                'users' => $users,
+                'role' => $role,
+                'user_id' => $userId,
+            ]);
+        }
+    }
+
+    public function updateRole() {
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $userId = $_POST['user_id'];
+            $userRole = $_POST['user_role'];
+
+            $repository = new AdminRepository();
+            $repository->updateRole($userId, $userRole);
+
+           $this->displayUsers();
+
+        }
+    }
 
 }

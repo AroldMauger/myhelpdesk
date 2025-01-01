@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/css/admin.css">
+
+    <title>MyHelpdesk</title>
+
+</head>
+<body class="dashboard-wrapper">
+<aside>
+    <img src="/images/mary.svg" class="logo-dashboard" alt="logo de l'entreprise Mary">
+        <a href="/admin" class="link-nav-bar">
+            <span>Accueil</span>
+        </a>
+        <a href="/workspaces" class="link-nav-bar">
+            <span>Espaces de travail</span>
+        </a>
+        <a href="/previous" class="link-nav-bar">
+            <span>Conversations administrateur</span>
+        </a>
+        <a href="/all-conversations" class="link-nav-bar">
+            <span>Conversations des utilisateurs</span>
+        </a>
+        <a href="/users" class="link-nav-bar">
+            <span>Gestion des utilisateurs</span>
+        </a>
+</aside>
+<main class="main-dashboard">
+    <div class="header-dashboard">
+        <h2>Gestion des utilisateurs</h2>
+        <a href="/logout" class="logout-link">Déconnexion</a>
+    </div>
+
+    <section class="chat-conversations">
+        <h3>Tableau de tous les utilisateurs</h3>
+        {% if users %}
+            <table class="conversations-table">
+                <thead>
+                <tr>
+                    <th>Utilisateur</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for user in users %}
+                    {% if user.role != "chatbot" %}
+                    <tr>
+                        <td>{{user.username}}</td>
+                        <td>{{user.email}}</td>
+                        <td>{{user.role}}</td>
+                    {% if user.id != user_id %}
+
+                        <td>
+                            {% if user.role != "administrateur" %}
+                                <form action="/update-role" method="POST" style="margin: 0;" onsubmit="return confirm('Êtes-vous sûr de vouloir attribuer le rôle administrateur ?');">
+                                    <input type="hidden" name="_method" value="PATCH">
+                                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                                    <input type="hidden" name="user_role" value="{{ user.role }}">
+                                    <button type="submit" class="btn-update">Rendre administrateur</button>
+                                </form>
+                            {% else %}
+                                <form action="/update-role" method="POST" style="margin: 0;" onsubmit="return confirm('Êtes-vous sûr de vouloir attribuer le rôle administrateur ?');">
+                                    <input type="hidden" name="_method" value="PATCH">
+                                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                                    <input type="hidden" name="user_role" value="{{ user.role }}">
+                                    <button type="submit" class="btn-update">Rendre utilisateur</button>
+                                </form>
+                            {% endif %}
+
+                        </td>
+                    {% endif %}
+
+                    </tr>
+                    {% endif %}
+
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>Aucun utilisateur.</p>
+        {% endif %}
+    </section>
+</main>
+
+<script src="/js/logout.js"></script>
+</body>
+</html>

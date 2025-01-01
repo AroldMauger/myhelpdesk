@@ -1,11 +1,11 @@
 <?php
 
 namespace App\Controller;
-//error_reporting(E_ALL);
-//ini_set('display_errors', 1);
 
-use App\DTO\ChatBotMessageDTO;
 use App\Model\ChatBotConstants;
+use App\Repository\ConversationRepository;
+use App\Repository\MessageRepository;
+use App\Service\AnythingLLMService;
 use App\Service\SessionService;
 class ConversationController extends AbstractController
 {
@@ -21,20 +21,23 @@ class ConversationController extends AbstractController
             // Stocker le workspaceSlug dans la session
             $_SESSION['workspace_slug'] = $workspaceSlug;
 
-            $chatbotResponse = $this->askChatbot($userMessage, $workspaceSlug);
-            $stmt = $this->pdo->prepare('INSERT INTO conversations (user_id, subject, category) VALUES (?, ?, ?)');
-            $stmt->execute([$userId, $userMessage, $workspaceSlug]);
+            $service = new AnythingLLMService();
 
-            $conversationId = $this->pdo->lastInsertId();
+            $chatbotResponse = $service->askChatbot($userMessage, $workspaceSlug);
+            $chatbotResponse['textResponse'] = preg_replace('/\s*\[.*?\]\s*/', '', $chatbotResponse['textResponse']);
 
-            $stmt = $this->pdo->prepare('INSERT INTO messages (conversation_id, user_id, message) VALUES (?, ?, ?)');
-            $stmt->execute([$conversationId, ChatBotConstants::CHAT_BOT_ID, $chatbotResponse->textResponse]);  // 0 pour l'ID du chatbot
+            $conversationRepository = new ConversationRepository();
+            $conversationId = $conversationRepository->createConversation($userId, $userMessage, $workspaceSlug);
+
+            $messageRepository = new MessageRepository();
+            $messageRepository->addUserMessage($conversationId, $userId, $userMessage);
+
+            $messageRepository->createMessage($conversationId, $chatbotResponse);
 
             header('Location: /conversation?id=' . $conversationId);
             exit;
         }
     }
-
 
     public function addMessage() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -43,42 +46,26 @@ class ConversationController extends AbstractController
 
             $conversationId = $_POST['conversation_id'] ?? $_GET['id'] ?? null;
 
-            if (!$conversationId) {
+            if (! $conversationId) {
                 throw new \Exception('ID de conversation non spécifié.');
             }
 
             $userId = $_SESSION['user_id'];
             $message = $_POST['message'];
 
-            if (isset($_SESSION['workspace_slug'])) {
-                $workspaceSlug = $_SESSION['workspace_slug'];
-            } else {
-                $stmt = $this->pdo->prepare('SELECT category FROM conversations WHERE id = ?');
-                $stmt->execute([$conversationId]);
-                $result = $stmt->fetch();
+            $messageRepository = new MessageRepository();
+            $workspaceSlug = $messageRepository->addUserMessage($conversationId, $userId, $message);
 
-                if ($result) {
-                    $workspaceSlug = $result['category'];
-                    $_SESSION['workspace_slug'] = $workspaceSlug;
-                } else {
-                    throw new \Exception('Conversation non trouvée.');
-                }
-            }
+            $service = new AnythingLLMService();
+            $chatbotResponse = $service->askChatbot($message, $workspaceSlug);
+            $chatbotResponse['textResponse'] = preg_replace('/\s*\[.*?\]\s*/', '', $chatbotResponse['textResponse']);
 
-            $stmt = $this->pdo->prepare('INSERT INTO messages (conversation_id, user_id, message) VALUES (?, ?, ?)');
-            $stmt->execute([$conversationId, $userId, $message]);
-
-            $chatbotResponse = $this->askChatbot($message, $workspaceSlug);
-
-            $stmt = $this->pdo->prepare('INSERT INTO messages (conversation_id, user_id, message) VALUES (?, ?, ?)');
-            $stmt->execute([$conversationId, ChatBotConstants::CHAT_BOT_ID, $chatbotResponse->textResponse]);
+            $messageRepository->createMessage($conversationId, $chatbotResponse);
 
             header('Location: /conversation?id=' . $conversationId);
             exit;
         }
     }
-
-
 
     public function endConversation()
     {
@@ -95,8 +82,8 @@ class ConversationController extends AbstractController
                 exit;
             }
 
-            $stmt = $this->pdo->prepare('UPDATE conversations SET rating = ? WHERE id = ?');
-            $stmt->execute([$rating, $conversationId]);
+            $repository = new ConversationRepository();
+            $repository->endConversation($rating, $conversationId);
 
             header('Location: /conversation?id=' . $conversationId);
             exit;
@@ -109,24 +96,16 @@ class ConversationController extends AbstractController
         $userId = $_SESSION['user_id'] ?? null;
         $role = $_SESSION['role'] ?? null;
 
-        if (!$conversationId) {
+        if (! $conversationId) {
             header('Location: /home');
             exit;
         }
 
-        $stmt = $this->pdo->prepare('SELECT * FROM conversations WHERE id = ?');
-        $stmt->execute([$conversationId]);
-        $conversation = $stmt->fetch();
+        $conversationRepository = new ConversationRepository();
+        $conversation = $conversationRepository->getConversation($conversationId);
 
-        $stmt = $this->pdo->prepare('
-        SELECT m.*, u.username
-        FROM messages m
-        JOIN users u ON m.user_id = u.id
-        WHERE m.conversation_id = ?
-        ORDER BY m.created_at ASC
-    ');
-        $stmt->execute([$conversationId]);
-        $messages = $stmt->fetchAll();
+        $messageRepository = new MessageRepository();
+        $messages = $messageRepository->getConversationMessages($conversationId);
 
         echo $this->render('conversations/conversation.html.twig', [
             'conversation' => $conversation,
@@ -136,37 +115,4 @@ class ConversationController extends AbstractController
             'role' => $role,
         ]);
     }
-
-
-    public function askChatbot($userMessage, $workspaceSlug)
-    {
-        $apiUrl = "http://172.27.144.1:3001/api/v1/workspace/{$workspaceSlug}/chat";
-        $accessToken = getenv('JWT_SECRET');
-
-        $postData = json_encode([
-            'message' => $userMessage,
-            'mode' => 'query'
-        ]);
-
-        $ch = curl_init($apiUrl);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json',
-            'Accept: application/json',
-            'Authorization: Bearer ' . $accessToken,
-        ]);
-
-        $response = curl_exec($ch);
-        curl_close($ch);
-
-        if ($response !== false) {
-            return json_decode($response);
-        }
-
-        return null;
-    }
-
-
 }

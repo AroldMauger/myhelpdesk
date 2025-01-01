@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Service;
 
 class SessionService
@@ -25,11 +26,24 @@ class SessionService
         unset($_SESSION[$type]);
     }
 
+    public function isAuthenticated(): bool
+    {
+        return isset($_SESSION);
+    }
+
+    public function getUserName(): ?string
+    {
+        if(isset($_SESSION['username'])) {
+            return $_SESSION['username'];
+        }
+
+        return null;
+    }
+
     public function logout()
     {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
-
 
             session_unset();
             session_destroy();
