@@ -32,29 +32,35 @@ aside a {
     width: 100%;
 }
 
-aside button{
+aside span{
     width: 100%;
 }
 
-.link-nav-bar button {
+.link-nav-bar  {
+    display: flex;
+    align-items: center;
+    align-content: center;
+    padding-left:4px ;
+    text-decoration: none;
     width: 100%;
     text-align: start;
-    background-color:#fcbc05;
     border: none;
     line-height: 1rem;
     border-radius: .25rem;
-    color: rgb(27 74 147);
     font-weight: 600;
     min-height: 48px;
     font-size:16px;
+    background-color:#fcbc05;
+    color: rgb(27 74 147);
 }
+
 
 .link-nav-bar:hover {
     cursor: pointer;
     color:white;
 }
 
-.link-nav-bar button:hover {
+.link-nav-bar span:hover {
     cursor: pointer;
     color:white;
 }

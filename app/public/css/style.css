@@ -101,11 +101,15 @@ aside a {
     width: 100%;
 }
 
-aside button{
+aside span{
     width: 100%;
 }
 
-.link-nav-bar button {
+.link-nav-bar {
+    display: flex;
+    align-items: center;
+    align-content: center;
+    padding-left:4px ;
     width: 100%;
     text-align: start;
     background-color:#fcbc05;
@@ -116,6 +120,7 @@ aside button{
     font-weight: 600;
     min-height: 48px;
     font-size:16px;
+    text-decoration: none;
 }
 
 .link-nav-bar:hover {
@@ -123,7 +128,7 @@ aside button{
     color:white;
 }
 
-.link-nav-bar button:hover {
+.link-nav-bar span:hover {
     cursor: pointer;
     color:white;
 }
