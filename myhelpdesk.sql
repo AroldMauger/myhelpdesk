@@ -66,7 +66,8 @@ CREATE TABLE `users` (
 
 --
 -- Déchargement des données de la table `users`
---
+-- arold.mauger@mary.fr : mdp = poiPOI098@
+-- myhelpdesk@mary.fr : mdp = DSIhelp2025@
 
 INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`) VALUES
 (0, 'Chatbot', 'chatbot@myhelpdesk.local', '', 'chatbot'),

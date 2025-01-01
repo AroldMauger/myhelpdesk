@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Controller\WorkspaceController;
+use App\Repository\ConversationRepository;
 use App\Service\SessionService;
 
 class HomeController extends AbstractController
@@ -11,11 +12,10 @@ class HomeController extends AbstractController
     public function landingPage() {
         echo $this->render('landing-page.html.twig');
     }
-    public function home() {
 
-        if (isset($_SESSION['user_id'])) {
-            $username = $_SESSION['username'];
-        } else {
+    public function home():void {
+
+        if (!$this->sessionService->isAuthenticated()) {
             header('Location: /login');
             exit;
         }
@@ -23,7 +23,7 @@ class HomeController extends AbstractController
         $workspaces = $workspaceController->getWorkspaces();
 
         echo $this->render('index.html.twig', [
-            'username' => $username,
+            'username' => $this->sessionService->getUserName(),
             'workspaces' => $workspaces
         ]);
     }
@@ -36,9 +36,8 @@ class HomeController extends AbstractController
                     $userId = $_SESSION['user_id'];
                     $role = $_SESSION['role'] ?? null;
 
-                    $stmt = $this->pdo->prepare('SELECT * FROM conversations WHERE user_id = ? ORDER BY created_at DESC');
-                    $stmt->execute([$userId]);
-                    $conversations = $stmt->fetchAll();
+                    $repository = new ConversationRepository();
+                    $conversations = $repository->getPreviousConversations($userId);
 
                 } else {
                     header('Location: /login');

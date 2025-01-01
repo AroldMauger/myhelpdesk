@@ -63,7 +63,7 @@
     <section class="workspaces-section">
         <h3>Créer un espace de travail</h3>
 
-        <form action="/create-workspace" method="POST" enctype="multipart/form-data" class="upload-form">
+        <form action="/create-workspace" method="POST" class="upload-form">
             <label for="title">Nom de l'espace de travail</label>
             <input type="text" name="title" id="title" required>
             <button type="submit" class="chatbot-submit">Créer</button>
@@ -88,7 +88,7 @@
                         {% for document in workspace.documents %}
                             <li class="document-item">
                                 <div class="document-header">
-                                    <span class="document-title">{{ document.metadata.title ?? 'Titre inconnu' }}</span>
+                                    <span class="document-title">{{ document.filename|split('-')[0] }}</span>
                                     <form action="/delete-document/{{ document.docpath | url_encode }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce document ?');">
                                         <input type="hidden" name="_method" value="DELETE">
                                         <button class="delete-btn">X</button>
