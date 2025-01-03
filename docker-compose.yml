@@ -102,11 +102,10 @@ services:
       - "3001:3001"
     volumes:
       - ./storage:/app/server/storage
+    env_file:
+      - .env
     environment:
       - STORAGE_DIR=/app/server/storage
-      - LLM_BACKEND_URL={LLM_BACKEND_URL:-}
-      - MISTRAL_API_KEY=${MISTRAL_API_KEY:-}
-      - JWT_SECRET=${JWT_SECRET:-}
     restart: always
     cap_add:
       - SYS_ADMIN

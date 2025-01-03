@@ -18,7 +18,12 @@ class SessionService
 
     public function getMessage(string $type): ?string
     {
-        return $_SESSION[$type] ?? null;
+        if(isset($_SESSION[$type])){
+            $message = $_SESSION[$type];
+            $this->clearMessage($type);
+            return $message;
+        }
+        return null;
     }
 
     public function clearMessage(string $type): void

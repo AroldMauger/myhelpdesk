@@ -2,11 +2,12 @@
 
 namespace App\Repository;
 
-use App\Controller\AbstractController;
 
-class ConversationRepository extends AbstractController
+use App\Model\Conversation;
+
+class ConversationRepository extends AbstractRepository
 {
-    public function getPreviousConversations($userId) {
+    public function getPreviousConversations(int $userId): array {
 
         $stmt = $this->pdo->prepare('SELECT * FROM conversations WHERE user_id = ? ORDER BY created_at DESC');
         $stmt->execute([$userId]);
@@ -15,7 +16,7 @@ class ConversationRepository extends AbstractController
         return $conversations;
     }
 
-    public function createConversation($userId, $userMessage, $workspaceSlug) {
+    public function createConversation(int $userId, string $userMessage, string $workspaceSlug): int {
 
         $stmt = $this->pdo->prepare('INSERT INTO conversations (user_id, subject, category) VALUES (?, ?, ?)');
 
@@ -24,13 +25,13 @@ class ConversationRepository extends AbstractController
         return $conversationId;
     }
 
-    public function endConversation($rating, $conversationId) {
+    public function endConversation(int $rating, int $conversationId): void {
 
         $stmt = $this->pdo->prepare('UPDATE conversations SET rating = ? WHERE id = ?');
         $stmt->execute([$rating, $conversationId]);
     }
 
-    public function getConversation($conversationId) {
+    public function getConversation(int $conversationId): array {
 
         $stmt = $this->pdo->prepare('SELECT * FROM conversations WHERE id = ?');
         $stmt->execute([$conversationId]);

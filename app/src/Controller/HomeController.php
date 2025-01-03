@@ -3,10 +3,11 @@
 namespace App\Controller;
 
 use App\Repository\ConversationRepository;
+use App\Service\AnythingLLMService;
 
 class HomeController extends AbstractController
 {
-    public function landingPage() {
+    public function landingPage():void {
         echo $this->render('landing-page.html.twig');
     }
 
@@ -17,8 +18,8 @@ class HomeController extends AbstractController
             exit;
         }
 
-        $workspaceController = new WorkspaceController();
-        $workspaces = $workspaceController->getWorkspaces();
+        $service = new AnythingLLMService();
+        $workspaces = $service->getWorkspaces();
 
         echo $this->render('index.html.twig', [
             'username' => $this->sessionService->getUserName(),
@@ -26,7 +27,7 @@ class HomeController extends AbstractController
         ]);
     }
 
-    public function previousConversations() {
+    public function previousConversations():void {
 
                 if (isset($_SESSION['user_id'])) {
                     $username = $_SESSION['username'];

@@ -3,26 +3,24 @@
 namespace App\Controller;
 
 use App\Service\AnythingLLMService;
+use App\Service\SessionService;
 
 class WorkspaceController extends AbstractController
 {
     public function displayWorkspaces(): void {
-        $success_message = isset($_SESSION['success_message']) ? $_SESSION['success_message'] : null;
-        $error_message = isset($_SESSION['error_message']) ? $_SESSION['error_message'] : null;
 
-        unset($_SESSION['success_message']);
-        unset($_SESSION['error_message']);
+        $service = new AnythingLLMService();
 
-        $workspaces = $this->getWorkspaces();
+        $workspaces = $service->getWorkspaces();
 
         echo $this->render('workspaces/workspaces.html.twig', [
             'workspaces' => $workspaces,
-            'success_message' => $success_message,
-            'error_message' => $error_message,
+            'success_message' => $this->sessionService->getMessage('success_message'),
+            'error_message' => $this->sessionService->getMessage('error_message'),
         ]);
     }
 
-    public function createWorkspace($workspaceTitle): void {
+    public function createWorkspace(array $workspaceTitle): void {
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $workspaceTitle = $_POST['title'];
@@ -32,53 +30,18 @@ class WorkspaceController extends AbstractController
             $response = $service->createWorkspace($workspaceTitle);
 
             if ($response === false) {
-                $errorMessage = 'Une erreur est survenue lors de la création du workspace.';
-                $_SESSION['error_message'] = $errorMessage;
+                $this->sessionService->setMessage('error_message', 'Une erreur est survenue lors de la création du workspace.');
                 $this->displayWorkspaces();
                 return;
             }
+            $this->sessionService->setMessage('success_message','Espace de travail créé avec succès !');
 
-            $successMessage = 'Espace de travail créé avec succès !';
-            $_SESSION['success_message'] = $successMessage;
             $this->displayWorkspaces();
         }
     }
 
-    public function getWorkspaces() {
 
-        $service = new AnythingLLMService();
-        $response = $service->getWorkspaces();
-
-        if ($response !== false) {
-            $workspacesData = json_decode($response, true);
-            $workspaces = $workspacesData['workspaces'] ?? [];
-
-            foreach ($workspaces as &$workspace) {
-                $workspace['documents'] = $this->getWorkspaceDocuments($workspace['slug']);
-            }
-
-            return $workspaces;
-        }
-
-        return [];
-    }
-
-    private function getWorkspaceDocuments($slug) {
-
-        $service = new AnythingLLMService();
-        $response = $service->getWorkspaceDocuments($slug);
-
-        if ($response !== false) {
-            $workspaceData = json_decode($response, true);
-            if (isset($workspaceData['workspace'][0]['documents'])) {
-                return $workspaceData['workspace'][0]['documents'];
-            }
-        }
-
-        return [];
-    }
-
-    public function delete($workspaceSlug)
+    public function delete(array $workspaceSlug):void
     {
         if (is_array($workspaceSlug) && isset($workspaceSlug['slug'])) {
             $workspaceSlug = $workspaceSlug['slug'];
@@ -87,32 +50,30 @@ class WorkspaceController extends AbstractController
         $service = new AnythingLLMService();
         $response = $service->deleteWorkspace($workspaceSlug);
 
-        if ($response === false || empty($response)) {
-            $error_message = "Erreur lors de la suppression de l'espace de travail.";
-            $_SESSION['error_message'] = $error_message;
-            $this->displayWorkspaces();
+        if ($response === false) {
+            $this->sessionService->setMessage('error_message', "Erreur lors de la suppression de l'espace de travail.");
         } else {
-            $success_message = "Espace de travail supprimé avec succès.";
-            $_SESSION['success_message'] = $success_message;
-            $this->displayWorkspaces();
+            $this->sessionService->setMessage('success_message',"Espace de travail supprimé avec succès.");
         }
+        $this->displayWorkspaces();
+
     }
 
-    public function deleteDocument($params) {
+    public function deleteDocument($params):void {
 
         $service = new AnythingLLMService();
         $httpCode = $service->deleteDocument($params);
 
         if ($httpCode === 200) {
-            $_SESSION['success_message'] = "Document supprimé avec succès.";
+            $this->sessionService->setMessage('success_message', 'Document supprimé avec succès.');
         } else {
-            $_SESSION['error_message'] = "Erreur lors de la suppression du document.";
+            $this->sessionService->setMessage('error_message', 'Erreur lors de la suppression du document.');
         }
 
         $this->displayWorkspaces();
     }
 
-    public function upload($workspaceSlug)
+    public function upload(array $workspaceSlug):void
     {
         $file = $_FILES['document'];
 
@@ -129,8 +90,8 @@ class WorkspaceController extends AbstractController
 
         $service->updateWorkspace($workspaceSlug, $documentLocation);
         $service->updatePin($workspaceSlug, $documentLocation);
-        $success_message = "Fichier téléchargé avec succès.";
-        $_SESSION['success_message'] = $success_message;
+
+        $this->sessionService->setMessage('success_message', 'Fichier téléchargé avec succès.');
         $this->displayWorkspaces();
     }
 }

@@ -2,6 +2,9 @@
 
 namespace App\Controller;
 
+
+use App\Repository\UserRepository;
+
 class LoginController extends AbstractController
 {
     public function displayLogin(): void
@@ -26,56 +29,49 @@ class LoginController extends AbstractController
 
     public function signup(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $username = $_POST['username'];
-            $email = $_POST['email'];
-            $password = $_POST['password'];
+        $username = $_POST['username'];
+        $email = $_POST['email'];
+        $password = $_POST['password'];
 
-            $stmt = $this->pdo->prepare('SELECT * FROM users WHERE email = ?');
-            $stmt->execute([$email]);
+        $repository = new UserRepository();
+        $user = $repository->fetchUserByEmail($email);
 
-            if ($stmt->rowCount() > 0) {
-                $this->sessionService->setMessage('error_message', 'Email utilisateur déjà existant');
-                header('Location: /signup');
-                exit;
-            } else {
-                $password_hash = password_hash($password, PASSWORD_DEFAULT);
-                $role = 'utilisateur';
+        if ($user) {
+            $this->sessionService->setMessage('error_message', 'Email utilisateur déjà existant');
+            header('Location: /signup');
+            exit;
+        } else {
+            $password_hash = password_hash($password, PASSWORD_DEFAULT);
+            $role = 'utilisateur';
 
-                $stmt = $this->pdo->prepare('INSERT INTO users (username, email, password_hash, role) VALUES (?, ?, ?, ?)');
-                $stmt->execute([$username, $email, $password_hash, $role]);
+            $repository->insertUser($username, $email, $password_hash, $role);
 
-                $this->sessionService->setMessage('success_message', 'Inscription réussie! Connectez-vous en cliquant ici : <a href="/login" class="connection-link">CONNEXION</a>');
-                header('Location: /signup');
-                exit;
-            }
+            $this->sessionService->setMessage('success_message', 'Inscription réussie! Connectez-vous en cliquant ici : <a href="/login" class="connection-link">CONNEXION</a>');
+            header('Location: /signup');
+            exit;
         }
     }
 
     public function login(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $email = $_POST['email'];
-            $password = $_POST['password'];
+        $email = $_POST['email'];
+        $password = $_POST['password'];
 
-            $stmt = $this->pdo->prepare('SELECT * FROM users WHERE email = ?');
-            $stmt->execute([$email]);
-            $user = $stmt->fetch();
-            if ($user && password_verify($password, $user['password_hash'])) {
-                if($user['role'] === 'utilisateur') {
-                    $_SESSION['user_id'] = $user['id'];
-                    $_SESSION['username'] = $user['username'];
-                    $_SESSION['role'] = $user['role'];
+        $repository = new UserRepository();
+        $user = $repository->fetchUserByEmail($email);
+            if ($user && password_verify($password, $user->getPasswordHash())) {
+                if($user->getRole() === 'utilisateur') {
+                    $_SESSION['user_id'] = $user->getId();
+                    $_SESSION['username'] = $user->getUsername();
+                    $_SESSION['role'] = $user->getRole();
 
                     header('Location: /home');
-                    exit;
-                } elseif ($user['role'] === 'administrateur') {
-                    $_SESSION['user_id'] = $user['id'];
-                    $_SESSION['username'] = $user['username'];
-                    $_SESSION['role'] = $user['role'];
+                } elseif ($user->getRole() === 'administrateur') {
+                    $_SESSION['user_id'] = $user->getId();
+                    $_SESSION['username'] = $user->getUsername();
+                    $_SESSION['role'] = $user->getRole();
 
                     header('Location: /admin');
-                    exit;
                 }
             } else {
                 $this->sessionService->setMessage('error_message', 'Email utilisateur ou mot de passe incorrect.');
@@ -83,5 +79,5 @@ class LoginController extends AbstractController
                 exit;
             }
         }
-    }
+
 }

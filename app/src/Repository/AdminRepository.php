@@ -2,11 +2,10 @@
 
 namespace App\Repository;
 
-use App\Controller\AbstractController;
 
-class AdminRepository extends AbstractController
+class AdminRepository extends AbstractRepository
 {
-    public function allConversations() {
+    public function allConversations():array {
 
         $stmt = $this->pdo->prepare('
         SELECT 
@@ -27,14 +26,14 @@ class AdminRepository extends AbstractController
         return $conversations;
     }
 
-    public function deleteConversation($conversationId) {
+    public function deleteConversation(int $conversationId):void {
 
         $stmt = $this->pdo->prepare('DELETE FROM conversations WHERE id = :id');
         $stmt->bindParam(':id', $conversationId, \PDO::PARAM_INT);
         $stmt->execute();
     }
 
-    public function getUsers() {
+    public function getUsers(): array {
         $stmt = $this->pdo->prepare('SELECT * FROM users');
         $stmt->execute();
         $users = $stmt->fetchAll();
@@ -42,7 +41,7 @@ class AdminRepository extends AbstractController
         return $users;
     }
 
-    public function updateRole($userId, $userRole) {
+    public function updateRole(int $userId, string $userRole):string {
         if($userRole === "utilisateur") {
             $newRole = "administrateur";
         } else {
