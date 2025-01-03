@@ -45,7 +45,7 @@ class AnythingLLMService
         return $response;
     }
 
-    public function getWorkspaces() {
+    public function getWorkspaces(): array {
 
         $ch = curl_init($this->apiBaseUrl . 'workspaces');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -57,7 +57,18 @@ class AnythingLLMService
         $response = curl_exec($ch);
         curl_close($ch);
 
-        return $response;
+        if ($response !== false) {
+            $workspacesData = json_decode($response, true);
+
+            $workspaces = $workspacesData['workspaces'] ?? [];
+
+            foreach ($workspaces as &$workspace) {
+                $workspace['documents'] = $this->getWorkspaceDocuments($workspace['slug']);
+            }
+            return $workspaces;
+        }
+
+        return [];
     }
 
     public function upload($file) {
@@ -82,7 +93,7 @@ class AnythingLLMService
         return $response;
     }
 
-    public function updateWorkspace($workspaceSlug, $documentLocation)
+    public function updateWorkspace(string $workspaceSlug, string $documentLocation)
     {
 
         $updateApiUrl = "http://172.27.144.1:3001/api/v1/workspace/$workspaceSlug/update-embeddings";
@@ -113,7 +124,7 @@ class AnythingLLMService
         return $updateHttpCode === 200 && isset($updateData['success']) && $updateData['success'];
     }
 
-    public function updatePin($workspaceSlug, $documentLocation)
+    public function updatePin(string $workspaceSlug, string $documentLocation)
     {
 
         $updatePostData = json_encode([
@@ -140,7 +151,7 @@ class AnythingLLMService
         return $updateHttpCode === 200 && isset($updateData['success']) && $updateData['success'];
     }
 
-    public function deleteDocument($params) {
+    public function deleteDocument(array $params): int {
 
         $docpath = urldecode($params['docpath']);
         $deletePayload = json_encode([
@@ -164,7 +175,7 @@ class AnythingLLMService
         return $httpCode;
     }
 
-    public function deleteWorkspace($workspaceSlug) {
+    public function deleteWorkspace(string $workspaceSlug):bool {
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->apiBaseUrl . "workspace/$workspaceSlug");
@@ -180,10 +191,10 @@ class AnythingLLMService
 
         curl_close($ch);
 
-        return $response;
+        return $response !==false;
     }
 
-    public function getWorkspaceDocuments($slug) {
+    public function getWorkspaceDocuments(string $slug): array {
 
         $ch = curl_init($this->apiBaseUrl . "workspace/$slug");
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -195,10 +206,19 @@ class AnythingLLMService
         $response = curl_exec($ch);
         curl_close($ch);
 
-        return $response;
+        if ($response !== false) {
+            $workspaceData = json_decode($response, true);
+            if (isset($workspaceData['workspace'][0]['documents'])) {
+                return $workspaceData['workspace'][0]['documents'];
+            }
+        }
+        return [];
+
     }
 
-    public function askChatbot($userMessage, $workspaceSlug) {
+
+
+    public function askChatbot(string $userMessage, string $workspaceSlug) {
 
             $postData = json_encode([
                 'message' => $userMessage,

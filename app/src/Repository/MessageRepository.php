@@ -2,19 +2,19 @@
 
 namespace App\Repository;
 
-use App\Controller\AbstractController;
 use App\Model\ChatBotConstants;
 
-class MessageRepository extends AbstractController
+class MessageRepository extends AbstractRepository
 {
-    public function createMessage($conversationId, $chatbotResponse) {
+    public function createMessage(int $conversationId, array $chatbotResponse):void {
 
         $stmt = $this->pdo->prepare('INSERT INTO messages (conversation_id, user_id, message) VALUES (?, ?, ?)');
 
         $stmt->execute([$conversationId, ChatBotConstants::CHAT_BOT_ID, $chatbotResponse['textResponse']]);
+        return;
     }
 
-    public function addUserMessage($conversationId, $userId, $message) {
+    public function addUserMessage(int $conversationId, int $userId, string $message): string {
         if (isset($_SESSION['workspace_slug'])) {
             $workspaceSlug = $_SESSION['workspace_slug'];
         } else {
@@ -36,7 +36,7 @@ class MessageRepository extends AbstractController
         return $workspaceSlug;
     }
 
-    public function getConversationMessages($conversationId) {
+    public function getConversationMessages(int $conversationId): array {
 
         $stmt = $this->pdo->prepare('
         SELECT m.*, u.username

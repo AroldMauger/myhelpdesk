@@ -2,10 +2,11 @@
 
 namespace App\Controller;
 use App\Repository\AdminRepository;
+use App\Service\AnythingLLMService;
 
 class AdminController extends AbstractController
 {
-    public function home() {
+    public function home():void {
 
         if (isset($_SESSION['user_id'])) {
             $username = $_SESSION['username'];
@@ -14,8 +15,8 @@ class AdminController extends AbstractController
             exit;
         }
 
-        $workspaceController = new WorkspaceController();
-        $workspaces = $workspaceController->getWorkspaces();
+        $service = new AnythingLLMService();
+        $workspaces = $service->getWorkspaces();
 
         echo $this->render('admin/dashboard.html.twig', [
             'username' => $username,
@@ -23,7 +24,7 @@ class AdminController extends AbstractController
         ]);
     }
 
-    public function allConversations()
+    public function allConversations():void
     {
         if (isset($_SESSION['user_id'])) {
             $role = $_SESSION['role'];
@@ -43,7 +44,7 @@ class AdminController extends AbstractController
         }
     }
 
-    public function deleteConversation()
+    public function deleteConversation():void
     {
         if (isset($_SESSION['user_id'])) {
             $role = $_SESSION['role'];
@@ -68,7 +69,7 @@ class AdminController extends AbstractController
         }
     }
 
-    public function displayUsers()
+    public function displayUsers():void
     {
         if (isset($_SESSION['user_id'])) {
             $role = $_SESSION['role'];
@@ -90,7 +91,7 @@ class AdminController extends AbstractController
         }
     }
 
-    public function updateRole() {
+    public function updateRole():void {
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $userId = $_POST['user_id'];

@@ -10,7 +10,6 @@ abstract class AbstractController
 {
     protected Environment $twig;
 
-    protected PDO $pdo;
 
     protected SessionService $sessionService;
 
@@ -18,7 +17,6 @@ abstract class AbstractController
     {
         $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/../template');
         $this->twig = new \Twig\Environment($loader);
-        $this->pdo = require __DIR__ . './../config/bdd.php';
         $this->sessionService = new SessionService();
         $this->sessionService->startSession();
     }

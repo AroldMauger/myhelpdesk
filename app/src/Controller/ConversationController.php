@@ -9,8 +9,7 @@ use App\Service\AnythingLLMService;
 use App\Service\SessionService;
 class ConversationController extends AbstractController
 {
-    public function startConversation() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    public function startConversation():void {
             $sessionService = new SessionService();
             $sessionService->startSession();
 
@@ -24,6 +23,7 @@ class ConversationController extends AbstractController
             $service = new AnythingLLMService();
 
             $chatbotResponse = $service->askChatbot($userMessage, $workspaceSlug);
+
             $chatbotResponse['textResponse'] = preg_replace('/\s*\[.*?\]\s*/', '', $chatbotResponse['textResponse']);
 
             $conversationRepository = new ConversationRepository();
@@ -35,20 +35,12 @@ class ConversationController extends AbstractController
             $messageRepository->createMessage($conversationId, $chatbotResponse);
 
             header('Location: /conversation?id=' . $conversationId);
-            exit;
-        }
+            return;
     }
 
-    public function addMessage() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $sessionService = new SessionService();
-            $sessionService->startSession();
+    public function addMessage():void {
 
             $conversationId = $_POST['conversation_id'] ?? $_GET['id'] ?? null;
-
-            if (! $conversationId) {
-                throw new \Exception('ID de conversation non spécifié.');
-            }
 
             $userId = $_SESSION['user_id'];
             $message = $_POST['message'];
@@ -63,13 +55,12 @@ class ConversationController extends AbstractController
             $messageRepository->createMessage($conversationId, $chatbotResponse);
 
             header('Location: /conversation?id=' . $conversationId);
-            exit;
-        }
+            return;
+
     }
 
-    public function endConversation()
+    public function endConversation():void
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sessionService = new SessionService();
             $sessionService->startSession();
 
@@ -77,20 +68,20 @@ class ConversationController extends AbstractController
             $rating = $_POST['rating'] ?? null;
 
             if ($rating === null) {
-                $_SESSION['error_message'] = 'Veuillez sélectionner une note avant de soumettre.';
+                $this->sessionService->setMessage('error_message', 'Veuillez sélectionner une note avant de soumettre.');
                 header('Location: /conversation?id=' . $conversationId);
-                exit;
+                return;
             }
 
             $repository = new ConversationRepository();
             $repository->endConversation($rating, $conversationId);
 
             header('Location: /conversation?id=' . $conversationId);
-            exit;
-        }
+            return;
+
     }
 
-    public function viewConversation()
+    public function viewConversation():void
     {
         $conversationId = $_GET['id'] ?? null;
         $userId = $_SESSION['user_id'] ?? null;
