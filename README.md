@@ -64,7 +64,12 @@ Avant de lancer l'application, assurez-vous de configurer les variables d'enviro
 - Faites un import depuis phpMyAdmin de la base de données présentes dans ce repo github "myhelpdesk.sql"
 - Les mots de passes sont écrits en commentaires aux lignes 69-70 du fichier pour que vous puissiez tester.
 
-4. **Ouvrir AnythingLLM sur le port 3001**
+4. **Télécharger le modèle mistral dans Ollama**
+
+- Entrez dans votre image Ollama et faites la commande `ollama run mistral:latest`
+- Vérifiez que vous avez bien le message "Ollama is running" sur le port 11434.
+
+5. **Ouvrir AnythingLLM sur le port 3001**
 
 - Lors de votre première connexion, il vous sera demandé de créer un utilisateur pour AnythingLLM.
 - Suivez les étapes et créez votre compte utilisateur.
@@ -75,13 +80,13 @@ Avant de lancer l'application, assurez-vous de configurer les variables d'enviro
 - Restez dans le menu à gauche et allez dans : Outils -> Clés API.
 - Générez une nouvelle clé API. Ce sera la variable d'environnement "JWT_SECRET" que vous mettrez dans votre .env
 
-5. **Possible erreur "Invalid Env"**
+6. **Possible erreur "Invalid Env"**
 
 - Il se peut que lors des premières utilisations de l'applications avec AnythingLLM, une erreur indique "Invalid Env" lors de vos requêtes API. Pour régler ce problème, rendez-vous sur la doc de AnythingLLM à : http://localhost:3001/api/docs
 - Vous devriez voir une documentation Swagger. Cliquez sur "Authorize" et collez votre JWT_SECRET généré auparavant dans AnythingLLM.
 - Cherchez la route `/v1/system/update-env` dans la section System Settings. Cliquez sur "Try it out" puis "Execute". Cela mettra à jour les variables d'env sur AnythingLLM et l'erreur ne devrait plus se reproduire. 
 
-6. **Possible erreur concernant "SQLite" au lancement de l'image AnythingLLM**
+7. **Possible erreur concernant "SQLite" au lancement de l'image AnythingLLM**
 - La commande `sudo chmod -R 777 /chemin_vers_projet_myhelpdesk/storage` est généralement suffisante pour régler ce problème. 
 
 ## Docker Compose
